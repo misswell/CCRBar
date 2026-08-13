@@ -15,6 +15,16 @@ struct SettingsView: View {
                         errorMessage = error.localizedDescription
                     }
                 }
+
+            Section("Updates") {
+                Button("Check for Updates") {
+                    appState.checkForUpdates()
+                }
+
+                Text("CCRBar checks for updates automatically once a day.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
         .formStyle(.grouped)
         .frame(width: 360)

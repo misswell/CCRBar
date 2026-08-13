@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05CC7D8235536815F27356E6 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C32B23F82C5EB4D25230089 /* AppSettings.swift */; };
 		391BC4BF43A333C5E2068E57 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A79ACA1614DF665ED6CE130 /* SettingsView.swift */; };
 		3F78C91B296F737A80D0381B /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8533CA72BEA60F9DC3BBF7 /* MenuBarView.swift */; };
 		3F9FC617C3A4E8CC1816E3EF /* CCRStatusMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D960EECE423CEDF386E3BF49 /* CCRStatusMonitor.swift */; };
@@ -16,17 +17,22 @@
 		ABF7C633C1C61A4C3D36A6BE /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473893C4C897CDCA8335C08C /* Version.swift */; };
 		AF2075E8A21ECD27603DF935 /* CommandRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C92FD81D84C0FAB58CFE335 /* CommandRunner.swift */; };
 		BA0A6F1C53DC4CE8921E7DC3 /* CCRStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7572E8A146C43D834C808F2 /* CCRStatus.swift */; };
+		CA56826A8587D27A7455BB0B /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = F6444DF70207B162DB7B69A1 /* Sparkle */; };
 		E1ACB9BE85A4AF8C1B987429 /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51102D09EBCF71921484C68E /* StatusView.swift */; };
 		F5EF8E7F7A1A306D8F139472 /* LoginItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873FB3692983A52EA30111B0 /* LoginItemManager.swift */; };
+		F8A5A1762B568C76E91B67AC /* UpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB8718600A79DA140082EF0 /* UpdateManager.swift */; };
 		FF770200BCE65BA20D4EE7D2 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90405B015C2196E37FDDC09E /* AppState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		01A6D7981EE08FA4F561C1EB /* CCRBarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRBarApp.swift; sourceTree = "<group>"; };
 		1A79ACA1614DF665ED6CE130 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		3E3BBBA71270684ABD92B5A2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		473893C4C897CDCA8335C08C /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
+		4BB8718600A79DA140082EF0 /* UpdateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateManager.swift; sourceTree = "<group>"; };
 		51102D09EBCF71921484C68E /* StatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
 		59989E9C42A1B7AC0788FFEF /* CCRBar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CCRBar.entitlements; sourceTree = "<group>"; };
+		6C32B23F82C5EB4D25230089 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		772E757BDED1005981952118 /* CCRBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CCRBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		873FB3692983A52EA30111B0 /* LoginItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemManager.swift; sourceTree = "<group>"; };
 		8C92FD81D84C0FAB58CFE335 /* CommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandRunner.swift; sourceTree = "<group>"; };
@@ -37,6 +43,17 @@
 		CDF5BE96D05DFDEC79DC4E96 /* CCRServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRServiceManager.swift; sourceTree = "<group>"; };
 		D960EECE423CEDF386E3BF49 /* CCRStatusMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRStatusMonitor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E92AEFF534C6219EBB4A325E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA56826A8587D27A7455BB0B /* Sparkle in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		05906388A78061DEB212D7D6 /* Utilities */ = {
@@ -77,6 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				59989E9C42A1B7AC0788FFEF /* CCRBar.entitlements */,
+				3E3BBBA71270684ABD92B5A2 /* Info.plist */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -97,6 +115,7 @@
 		87D661556955843CC7F98DF8 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				6C32B23F82C5EB4D25230089 /* AppSettings.swift */,
 				C7572E8A146C43D834C808F2 /* CCRStatus.swift */,
 			);
 			path = Models;
@@ -119,6 +138,7 @@
 				D960EECE423CEDF386E3BF49 /* CCRStatusMonitor.swift */,
 				8C92FD81D84C0FAB58CFE335 /* CommandRunner.swift */,
 				873FB3692983A52EA30111B0 /* LoginItemManager.swift */,
+				4BB8718600A79DA140082EF0 /* UpdateManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -131,6 +151,7 @@
 			buildConfigurationList = 1F3CB75CA000E0EC651D7A8A /* Build configuration list for PBXNativeTarget "CCRBar" */;
 			buildPhases = (
 				5E47771D176387010AEE8F3F /* Sources */,
+				E92AEFF534C6219EBB4A325E /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -138,6 +159,7 @@
 			);
 			name = CCRBar;
 			packageProductDependencies = (
+				F6444DF70207B162DB7B69A1 /* Sparkle */,
 			);
 			productName = CCRBar;
 			productReference = 772E757BDED1005981952118 /* CCRBar.app */;
@@ -152,9 +174,6 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
-					C36DB33BED3A8B3C6A19D806 = {
-						ProvisioningStyle = Automatic;
-					};
 				};
 			};
 			buildConfigurationList = 0A62063B048A689B1E0008A1 /* Build configuration list for PBXProject "CCRBar" */;
@@ -166,6 +185,9 @@
 			);
 			mainGroup = 32C216CFFC208746201ECED7;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				26D175763FD34AA5EDE7B40F /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4D9DF5957D0C4624559AACE8 /* Products */;
 			projectDirPath = "";
@@ -181,6 +203,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05CC7D8235536815F27356E6 /* AppSettings.swift in Sources */,
 				FF770200BCE65BA20D4EE7D2 /* AppState.swift in Sources */,
 				AA2925BC20D14EF2709A14FD /* CCRBarApp.swift in Sources */,
 				6260548F3420472F5E17BA5A /* CCRExecutableResolver.swift in Sources */,
@@ -192,6 +215,7 @@
 				3F78C91B296F737A80D0381B /* MenuBarView.swift in Sources */,
 				391BC4BF43A333C5E2068E57 /* SettingsView.swift in Sources */,
 				E1ACB9BE85A4AF8C1B987429 /* StatusView.swift in Sources */,
+				F8A5A1762B568C76E91B67AC /* UpdateManager.swift in Sources */,
 				ABF7C633C1C61A4C3D36A6BE /* Version.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -205,8 +229,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_FILE = CCRBar/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -224,8 +247,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_FILE = CCRBar/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -271,12 +293,13 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = CCRBar/Resources/CCRBar.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = U8U443D7ZL;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -288,15 +311,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = CCRBar;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 0.1.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ccrbar.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -360,9 +381,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = CCRBar;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 0.1.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -400,6 +418,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		26D175763FD34AA5EDE7B40F /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.9.5;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F6444DF70207B162DB7B69A1 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26D175763FD34AA5EDE7B40F /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C2FAB6FB80B480E704F084A6 /* Project object */;
 }
