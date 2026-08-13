@@ -1,0 +1,385 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		391BC4BF43A333C5E2068E57 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A79ACA1614DF665ED6CE130 /* SettingsView.swift */; };
+		3F78C91B296F737A80D0381B /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8533CA72BEA60F9DC3BBF7 /* MenuBarView.swift */; };
+		3F9FC617C3A4E8CC1816E3EF /* CCRStatusMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D960EECE423CEDF386E3BF49 /* CCRStatusMonitor.swift */; };
+		6260548F3420472F5E17BA5A /* CCRExecutableResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2D2F81A24C06B7506407B3 /* CCRExecutableResolver.swift */; };
+		949690612203324F360046FB /* CCRServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF5BE96D05DFDEC79DC4E96 /* CCRServiceManager.swift */; };
+		AA2925BC20D14EF2709A14FD /* CCRBarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01A6D7981EE08FA4F561C1EB /* CCRBarApp.swift */; };
+		ABF7C633C1C61A4C3D36A6BE /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473893C4C897CDCA8335C08C /* Version.swift */; };
+		AF2075E8A21ECD27603DF935 /* CommandRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C92FD81D84C0FAB58CFE335 /* CommandRunner.swift */; };
+		BA0A6F1C53DC4CE8921E7DC3 /* CCRStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7572E8A146C43D834C808F2 /* CCRStatus.swift */; };
+		E1ACB9BE85A4AF8C1B987429 /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51102D09EBCF71921484C68E /* StatusView.swift */; };
+		F5EF8E7F7A1A306D8F139472 /* LoginItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873FB3692983A52EA30111B0 /* LoginItemManager.swift */; };
+		FF770200BCE65BA20D4EE7D2 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90405B015C2196E37FDDC09E /* AppState.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		01A6D7981EE08FA4F561C1EB /* CCRBarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRBarApp.swift; sourceTree = "<group>"; };
+		1A79ACA1614DF665ED6CE130 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		473893C4C897CDCA8335C08C /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
+		51102D09EBCF71921484C68E /* StatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
+		772E757BDED1005981952118 /* CCRBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CCRBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		873FB3692983A52EA30111B0 /* LoginItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemManager.swift; sourceTree = "<group>"; };
+		8C92FD81D84C0FAB58CFE335 /* CommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandRunner.swift; sourceTree = "<group>"; };
+		8D2D2F81A24C06B7506407B3 /* CCRExecutableResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRExecutableResolver.swift; sourceTree = "<group>"; };
+		90405B015C2196E37FDDC09E /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		9E8533CA72BEA60F9DC3BBF7 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		C7572E8A146C43D834C808F2 /* CCRStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRStatus.swift; sourceTree = "<group>"; };
+		CDF5BE96D05DFDEC79DC4E96 /* CCRServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRServiceManager.swift; sourceTree = "<group>"; };
+		D960EECE423CEDF386E3BF49 /* CCRStatusMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRStatusMonitor.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		05906388A78061DEB212D7D6 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				473893C4C897CDCA8335C08C /* Version.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		189E251054E8EA61C3E0AECE /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				9E8533CA72BEA60F9DC3BBF7 /* MenuBarView.swift */,
+				1A79ACA1614DF665ED6CE130 /* SettingsView.swift */,
+				51102D09EBCF71921484C68E /* StatusView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		32C216CFFC208746201ECED7 = {
+			isa = PBXGroup;
+			children = (
+				6DD9C9468A70D99C31289996 /* CCRBar */,
+				4D9DF5957D0C4624559AACE8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4D9DF5957D0C4624559AACE8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				772E757BDED1005981952118 /* CCRBar.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6DD9C9468A70D99C31289996 /* CCRBar */ = {
+			isa = PBXGroup;
+			children = (
+				D8EDD4A6E5C9D98F5961DDA4 /* App */,
+				87D661556955843CC7F98DF8 /* Models */,
+				EE53B14720702F07D519F08E /* Services */,
+				05906388A78061DEB212D7D6 /* Utilities */,
+				189E251054E8EA61C3E0AECE /* Views */,
+			);
+			path = CCRBar;
+			sourceTree = "<group>";
+		};
+		87D661556955843CC7F98DF8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C7572E8A146C43D834C808F2 /* CCRStatus.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		D8EDD4A6E5C9D98F5961DDA4 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				90405B015C2196E37FDDC09E /* AppState.swift */,
+				01A6D7981EE08FA4F561C1EB /* CCRBarApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		EE53B14720702F07D519F08E /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				8D2D2F81A24C06B7506407B3 /* CCRExecutableResolver.swift */,
+				CDF5BE96D05DFDEC79DC4E96 /* CCRServiceManager.swift */,
+				D960EECE423CEDF386E3BF49 /* CCRStatusMonitor.swift */,
+				8C92FD81D84C0FAB58CFE335 /* CommandRunner.swift */,
+				873FB3692983A52EA30111B0 /* LoginItemManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C36DB33BED3A8B3C6A19D806 /* CCRBar */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F3CB75CA000E0EC651D7A8A /* Build configuration list for PBXNativeTarget "CCRBar" */;
+			buildPhases = (
+				5E47771D176387010AEE8F3F /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CCRBar;
+			packageProductDependencies = (
+			);
+			productName = CCRBar;
+			productReference = 772E757BDED1005981952118 /* CCRBar.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C2FAB6FB80B480E704F084A6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					C36DB33BED3A8B3C6A19D806 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 0A62063B048A689B1E0008A1 /* Build configuration list for PBXProject "CCRBar" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 32C216CFFC208746201ECED7;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 4D9DF5957D0C4624559AACE8 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C36DB33BED3A8B3C6A19D806 /* CCRBar */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5E47771D176387010AEE8F3F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF770200BCE65BA20D4EE7D2 /* AppState.swift in Sources */,
+				AA2925BC20D14EF2709A14FD /* CCRBarApp.swift in Sources */,
+				6260548F3420472F5E17BA5A /* CCRExecutableResolver.swift in Sources */,
+				949690612203324F360046FB /* CCRServiceManager.swift in Sources */,
+				BA0A6F1C53DC4CE8921E7DC3 /* CCRStatus.swift in Sources */,
+				3F9FC617C3A4E8CC1816E3EF /* CCRStatusMonitor.swift in Sources */,
+				AF2075E8A21ECD27603DF935 /* CommandRunner.swift in Sources */,
+				F5EF8E7F7A1A306D8F139472 /* LoginItemManager.swift in Sources */,
+				3F78C91B296F737A80D0381B /* MenuBarView.swift in Sources */,
+				391BC4BF43A333C5E2068E57 /* SettingsView.swift in Sources */,
+				E1ACB9BE85A4AF8C1B987429 /* StatusView.swift in Sources */,
+				ABF7C633C1C61A4C3D36A6BE /* Version.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		498A764192917BD48597E1F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ccrbar.app;
+				PRODUCT_NAME = CCRBar;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		6D5725AA0424BB33443E63CA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ccrbar.app;
+				PRODUCT_NAME = CCRBar;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		84A9B2E7DC2A78A768909EC5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = CCRBar;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ccrbar.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		CC8AAFE4CE867BCC14F25A30 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = CCRBar;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ccrbar.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0A62063B048A689B1E0008A1 /* Build configuration list for PBXProject "CCRBar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC8AAFE4CE867BCC14F25A30 /* Debug */,
+				84A9B2E7DC2A78A768909EC5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		1F3CB75CA000E0EC651D7A8A /* Build configuration list for PBXNativeTarget "CCRBar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6D5725AA0424BB33443E63CA /* Debug */,
+				498A764192917BD48597E1F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C2FAB6FB80B480E704F084A6 /* Project object */;
+}

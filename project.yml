@@ -1,0 +1,30 @@
+name: CCRBar
+options:
+  bundleIdPrefix: com.ccrbar
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_IDENTITY: "-"
+    ENABLE_HARDENED_RUNTIME: YES
+    PRODUCT_BUNDLE_IDENTIFIER: com.ccrbar.app
+    INFOPLIST_KEY_LSUIElement: YES
+    GENERATE_INFOPLIST_FILE: YES
+    INFOPLIST_KEY_NSHumanReadableCopyright: "CCRBar"
+    SWIFT_EMIT_LOC_STRINGS: NO
+targets:
+  CCRBar:
+    type: application
+    platform: macOS
+    sources:
+      - CCRBar
+    settings:
+      base:
+        PRODUCT_NAME: CCRBar
+        PRODUCT_BUNDLE_IDENTIFIER: com.ccrbar.app
+        INFOPLIST_KEY_LSUIElement: YES
+        GENERATE_INFOPLIST_FILE: YES
