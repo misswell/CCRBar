@@ -18,6 +18,10 @@ settings:
     SWIFT_EMIT_LOC_STRINGS: NO
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
+  configs:
+    Release:
+      CODE_SIGN_ENTITLEMENTS: CCRBar/Resources/CCRBar.entitlements
+      CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
 targets:
   CCRBar:
     type: application

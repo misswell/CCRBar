@@ -26,6 +26,7 @@
 		1A79ACA1614DF665ED6CE130 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		473893C4C897CDCA8335C08C /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		51102D09EBCF71921484C68E /* StatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
+		59989E9C42A1B7AC0788FFEF /* CCRBar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CCRBar.entitlements; sourceTree = "<group>"; };
 		772E757BDED1005981952118 /* CCRBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CCRBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		873FB3692983A52EA30111B0 /* LoginItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemManager.swift; sourceTree = "<group>"; };
 		8C92FD81D84C0FAB58CFE335 /* CommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandRunner.swift; sourceTree = "<group>"; };
@@ -72,11 +73,20 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		5E9EBF67D00CE04FCDAFD38B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				59989E9C42A1B7AC0788FFEF /* CCRBar.entitlements */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		6DD9C9468A70D99C31289996 /* CCRBar */ = {
 			isa = PBXGroup;
 			children = (
 				D8EDD4A6E5C9D98F5961DDA4 /* App */,
 				87D661556955843CC7F98DF8 /* Models */,
+				5E9EBF67D00CE04FCDAFD38B /* Resources */,
 				EE53B14720702F07D519F08E /* Services */,
 				05906388A78061DEB212D7D6 /* Utilities */,
 				189E251054E8EA61C3E0AECE /* Views */,
@@ -260,7 +270,9 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_ENTITLEMENTS = CCRBar/Resources/CCRBar.entitlements;
 				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
