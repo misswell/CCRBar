@@ -16,8 +16,8 @@ settings:
     GENERATE_INFOPLIST_FILE: YES
     INFOPLIST_KEY_NSHumanReadableCopyright: "CCRBar"
     SWIFT_EMIT_LOC_STRINGS: NO
-    MARKETING_VERSION: "0.1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "0.1.1"
+    CURRENT_PROJECT_VERSION: "2"
   configs:
     Release:
       CODE_SIGN_ENTITLEMENTS: CCRBar/Resources/CCRBar.entitlements
@@ -34,5 +34,5 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.ccrbar.app
         INFOPLIST_KEY_LSUIElement: YES
         GENERATE_INFOPLIST_FILE: YES
-        MARKETING_VERSION: "0.1.0"
-        CURRENT_PROJECT_VERSION: "1"
+        MARKETING_VERSION: "0.1.1"
+        CURRENT_PROJECT_VERSION: "2"
