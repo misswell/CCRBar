@@ -97,18 +97,20 @@ struct MenuBarView: View {
 
     @ViewBuilder
     private var setupErrorSection: some View {
-        if !appState.resolver.isNodeInstalled {
-            Label("Node.js 22+ Required", systemImage: "exclamationmark.triangle.fill")
-                .foregroundStyle(.red)
-            Text("Node.js 22 or newer is required to run CCR.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        } else if !appState.resolver.nodeMeetsRequirement {
-            Label("Node.js \(appState.resolver.nodeVersionString ?? "?") detected", systemImage: "exclamationmark.triangle.fill")
-                .foregroundStyle(.red)
-            Text("Node.js 22+ is required.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+        if !appState.resolver.isCCRApp {
+            if !appState.resolver.isNodeInstalled {
+                Label("Node.js 22+ Required", systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.red)
+                Text("Node.js 22 or newer is required to run CCR.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else if !appState.resolver.nodeMeetsRequirement {
+                Label("Node.js \(appState.resolver.nodeVersionString ?? "?") detected", systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.red)
+                Text("Node.js 22+ is required.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
 
         if !appState.resolver.isCCRInstalled {

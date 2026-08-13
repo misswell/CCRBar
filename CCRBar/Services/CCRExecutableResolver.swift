@@ -12,6 +12,7 @@ final class CCRExecutableResolver: ObservableObject {
 
     var isCCRInstalled: Bool { ccrPath != nil }
     var isNodeInstalled: Bool { nodePath != nil }
+    var isCCRApp: Bool { ccrPath?.hasSuffix("/ccr-app") == true }
 
     var nodeMeetsRequirement: Bool {
         guard let nodeVersion else { return false }
@@ -25,7 +26,7 @@ final class CCRExecutableResolver: ObservableObject {
 
     func refresh() {
         loginPath = queryLoginPath()
-        ccrPath = resolveExecutable(named: "ccr")
+        ccrPath = resolveCCRExecutable()
         nodePath = resolveExecutable(named: "node")
 
         if let nodePath {
@@ -38,15 +39,25 @@ final class CCRExecutableResolver: ObservableObject {
             nodeVersion = nil
         }
 
-        if ccrPath == nil && nodePath == nil {
-            lastError = "Neither ccr nor node was found in the login shell PATH."
-        } else if ccrPath == nil {
+        if ccrPath == nil {
             lastError = "ccr was not found in the login shell PATH."
+        } else if isCCRApp {
+            // Desktop app ships its own bundled Node runtime via Electron.
+            lastError = nil
+        } else if nodePath == nil {
+            lastError = "Node.js was not found in the login shell PATH."
         } else if !nodeMeetsRequirement {
             lastError = "Node.js 22+ is required (found \(nodeVersionString ?? "unknown"))."
         } else {
             lastError = nil
         }
+    }
+
+    private func resolveCCRExecutable() -> String? {
+        if let path = resolveExecutable(named: "ccr") {
+            return path
+        }
+        return resolveExecutable(named: "ccr-app")
     }
 
     private func queryLoginPath() -> String? {
