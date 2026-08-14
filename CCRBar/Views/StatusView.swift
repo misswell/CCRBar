@@ -4,7 +4,8 @@ struct StatusView: View {
     let status: CCRStatus
     let gatewayUp: Bool
     let managementUp: Bool
-    let nodeVersion: String?
+    let nodeRuntimeDescription: String?
+    let managementPort: UInt16
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -15,8 +16,8 @@ struct StatusView: View {
                     .font(.headline)
             }
 
-            if let nodeVersion {
-                Text("Node.js \(nodeVersion)")
+            if let nodeRuntimeDescription {
+                Text(nodeRuntimeDescription)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -41,7 +42,7 @@ struct StatusView: View {
                     Text("Management")
                         .fontWeight(.medium)
                     Spacer()
-                    Text("127.0.0.1:3458")
+                    Text("127.0.0.1:\(managementPort)")
                         .foregroundStyle(.secondary)
                 }
             }

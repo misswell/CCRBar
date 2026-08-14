@@ -21,27 +21,31 @@ final class CCRServiceManager: ObservableObject {
         return stderr.isEmpty ? "Command failed with exit code \(result.exitCode)" : stderr
     }
 
-    func start() async {
+    func start(port: UInt16, startGateway: Bool = true) async {
         statusMonitor.setStarting()
-        await runCommand(["start", "--no-open"])
+        var arguments = ["start", "--port", String(port), "--no-open"]
+        if !startGateway {
+            arguments.append("--no-gateway")
+        }
+        await runCommand(arguments)
     }
 
     func stop() async {
         await runCommand(["stop"])
     }
 
-    func restart() async {
+    func restart(port: UInt16) async {
         await stop()
         try? await Task.sleep(nanoseconds: 500_000_000)
-        await start()
+        await start(port: port)
     }
 
-    func openDashboard() {
-        guard let ccrPath = resolver.ccrPath else { return }
-        lastCommand = "ccr ui"
+    func openDashboard(port: UInt16) {
+        guard resolver.runtime.canRun, let ccrPath = resolver.runtime.ccrPath else { return }
+        lastCommand = "ccr ui --port \(port)"
         let launched = CommandRunner.launch(
             executable: ccrPath,
-            arguments: ["ui"],
+            arguments: ["ui", "--port", String(port)],
             environment: resolver.environment
         )
         lastResult = launched
@@ -50,7 +54,7 @@ final class CCRServiceManager: ObservableObject {
     }
 
     private func runCommand(_ arguments: [String]) async {
-        guard let ccrPath = resolver.ccrPath else {
+        guard resolver.runtime.canRun, let ccrPath = resolver.runtime.ccrPath else {
             lastResult = CommandResult(stdout: "", stderr: "ccr not installed", exitCode: -1)
             return
         }

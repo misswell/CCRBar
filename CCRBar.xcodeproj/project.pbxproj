@@ -7,11 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01A035159680709E59E790FD /* CCRRuntimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB701F5D1E6EC399F060AFA /* CCRRuntimeTests.swift */; };
+		05CC7D8235536815F27356E6 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C32B23F82C5EB4D25230089 /* AppSettings.swift */; };
 		391BC4BF43A333C5E2068E57 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A79ACA1614DF665ED6CE130 /* SettingsView.swift */; };
 		3F78C91B296F737A80D0381B /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8533CA72BEA60F9DC3BBF7 /* MenuBarView.swift */; };
 		3F9FC617C3A4E8CC1816E3EF /* CCRStatusMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D960EECE423CEDF386E3BF49 /* CCRStatusMonitor.swift */; };
 		6260548F3420472F5E17BA5A /* CCRExecutableResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2D2F81A24C06B7506407B3 /* CCRExecutableResolver.swift */; };
 		949690612203324F360046FB /* CCRServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF5BE96D05DFDEC79DC4E96 /* CCRServiceManager.swift */; };
+		A1F5FBC4665AFAFC4EE8DB2D /* CCRRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C57DB5B8CCAE2D211A9AEF /* CCRRuntime.swift */; };
 		AA2925BC20D14EF2709A14FD /* CCRBarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01A6D7981EE08FA4F561C1EB /* CCRBarApp.swift */; };
 		ABF7C633C1C61A4C3D36A6BE /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473893C4C897CDCA8335C08C /* Version.swift */; };
 		AF2075E8A21ECD27603DF935 /* CommandRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C92FD81D84C0FAB58CFE335 /* CommandRunner.swift */; };
@@ -23,6 +26,16 @@
 		FF770200BCE65BA20D4EE7D2 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90405B015C2196E37FDDC09E /* AppState.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		BBEA43097BB53A9049AE1B2F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C2FAB6FB80B480E704F084A6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C36DB33BED3A8B3C6A19D806;
+			remoteInfo = CCRBar;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		01A6D7981EE08FA4F561C1EB /* CCRBarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRBarApp.swift; sourceTree = "<group>"; };
 		1A79ACA1614DF665ED6CE130 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -31,15 +44,19 @@
 		4BB8718600A79DA140082EF0 /* UpdateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateManager.swift; sourceTree = "<group>"; };
 		51102D09EBCF71921484C68E /* StatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
 		59989E9C42A1B7AC0788FFEF /* CCRBar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CCRBar.entitlements; sourceTree = "<group>"; };
+		6C32B23F82C5EB4D25230089 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		772E757BDED1005981952118 /* CCRBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CCRBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		873FB3692983A52EA30111B0 /* LoginItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemManager.swift; sourceTree = "<group>"; };
 		8C92FD81D84C0FAB58CFE335 /* CommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandRunner.swift; sourceTree = "<group>"; };
 		8D2D2F81A24C06B7506407B3 /* CCRExecutableResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRExecutableResolver.swift; sourceTree = "<group>"; };
 		90405B015C2196E37FDDC09E /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		95C57DB5B8CCAE2D211A9AEF /* CCRRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRRuntime.swift; sourceTree = "<group>"; };
+		9CB701F5D1E6EC399F060AFA /* CCRRuntimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRRuntimeTests.swift; sourceTree = "<group>"; };
 		9E8533CA72BEA60F9DC3BBF7 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		C7572E8A146C43D834C808F2 /* CCRStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRStatus.swift; sourceTree = "<group>"; };
 		CDF5BE96D05DFDEC79DC4E96 /* CCRServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRServiceManager.swift; sourceTree = "<group>"; };
 		D960EECE423CEDF386E3BF49 /* CCRStatusMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRStatusMonitor.swift; sourceTree = "<group>"; };
+		E0DEE50C79214DFB2D099FB0 /* CCRBarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CCRBarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +93,7 @@
 			isa = PBXGroup;
 			children = (
 				6DD9C9468A70D99C31289996 /* CCRBar */,
+				537AFDABE07A2090132D82B0 /* CCRBarTests */,
 				4D9DF5957D0C4624559AACE8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -84,8 +102,17 @@
 			isa = PBXGroup;
 			children = (
 				772E757BDED1005981952118 /* CCRBar.app */,
+				E0DEE50C79214DFB2D099FB0 /* CCRBarTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		537AFDABE07A2090132D82B0 /* CCRBarTests */ = {
+			isa = PBXGroup;
+			children = (
+				9CB701F5D1E6EC399F060AFA /* CCRRuntimeTests.swift */,
+			);
+			path = CCRBarTests;
 			sourceTree = "<group>";
 		};
 		5E9EBF67D00CE04FCDAFD38B /* Resources */ = {
@@ -113,6 +140,8 @@
 		87D661556955843CC7F98DF8 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				6C32B23F82C5EB4D25230089 /* AppSettings.swift */,
+				95C57DB5B8CCAE2D211A9AEF /* CCRRuntime.swift */,
 				C7572E8A146C43D834C808F2 /* CCRStatus.swift */,
 			);
 			path = Models;
@@ -143,6 +172,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		93FA78ACC72492C5CCD36617 /* CCRBarTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9877436AE6F75689A8657695 /* Build configuration list for PBXNativeTarget "CCRBarTests" */;
+			buildPhases = (
+				594BFEFAA39D66D6E95A3681 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0750D71FA2CDD41736CD99F6 /* PBXTargetDependency */,
+			);
+			name = CCRBarTests;
+			packageProductDependencies = (
+			);
+			productName = CCRBarTests;
+			productReference = E0DEE50C79214DFB2D099FB0 /* CCRBarTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		C36DB33BED3A8B3C6A19D806 /* CCRBar */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1F3CB75CA000E0EC651D7A8A /* Build configuration list for PBXNativeTarget "CCRBar" */;
@@ -191,18 +238,29 @@
 			projectRoot = "";
 			targets = (
 				C36DB33BED3A8B3C6A19D806 /* CCRBar */,
+				93FA78ACC72492C5CCD36617 /* CCRBarTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		594BFEFAA39D66D6E95A3681 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				01A035159680709E59E790FD /* CCRRuntimeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5E47771D176387010AEE8F3F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05CC7D8235536815F27356E6 /* AppSettings.swift in Sources */,
 				FF770200BCE65BA20D4EE7D2 /* AppState.swift in Sources */,
 				AA2925BC20D14EF2709A14FD /* CCRBarApp.swift in Sources */,
 				6260548F3420472F5E17BA5A /* CCRExecutableResolver.swift in Sources */,
+				A1F5FBC4665AFAFC4EE8DB2D /* CCRRuntime.swift in Sources */,
 				949690612203324F360046FB /* CCRServiceManager.swift in Sources */,
 				BA0A6F1C53DC4CE8921E7DC3 /* CCRStatus.swift in Sources */,
 				3F9FC617C3A4E8CC1816E3EF /* CCRStatusMonitor.swift in Sources */,
@@ -218,19 +276,44 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		0750D71FA2CDD41736CD99F6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C36DB33BED3A8B3C6A19D806 /* CCRBar */;
+			targetProxy = BBEA43097BB53A9049AE1B2F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		2898FE0E537584AC11ADA4AE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ccrbar.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CCRBar.app/Contents/MacOS/CCRBar";
+			};
+			name = Release;
+		};
 		498A764192917BD48597E1F9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				INFOPLIST_FILE = CCRBar/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ccrbar.app;
 				PRODUCT_NAME = CCRBar;
 				SDKROOT = macosx;
@@ -242,13 +325,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				INFOPLIST_FILE = CCRBar/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ccrbar.app;
 				PRODUCT_NAME = CCRBar;
 				SDKROOT = macosx;
@@ -293,7 +376,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = U8U443D7ZL;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -308,7 +391,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ccrbar.app;
@@ -358,7 +441,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -378,7 +461,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -389,6 +472,23 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		EEBD3D6B9544322B0168022D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ccrbar.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CCRBar.app/Contents/MacOS/CCRBar";
 			};
 			name = Debug;
 		};
@@ -409,6 +509,15 @@
 			buildConfigurations = (
 				6D5725AA0424BB33443E63CA /* Debug */,
 				498A764192917BD48597E1F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9877436AE6F75689A8657695 /* Build configuration list for PBXNativeTarget "CCRBarTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EEBD3D6B9544322B0168022D /* Debug */,
+				2898FE0E537584AC11ADA4AE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

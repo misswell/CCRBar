@@ -3,61 +3,121 @@ import Combine
 
 @MainActor
 final class CCRExecutableResolver: ObservableObject {
-    @Published private(set) var ccrPath: String?
-    @Published private(set) var nodePath: String?
-    @Published private(set) var nodeVersion: Version?
-    @Published private(set) var nodeVersionString: String?
-    @Published private(set) var loginPath: String?
-    @Published private(set) var lastError: String?
+    static let minimumNodeVersion = CCRRuntime.minimumNodeVersion
 
-    var isCCRInstalled: Bool { ccrPath != nil }
-    var isNodeInstalled: Bool { nodePath != nil }
-    var isCCRApp: Bool { ccrPath?.hasSuffix("/ccr-app") == true }
+    @Published private(set) var runtime = CCRRuntime.unavailable
 
-    var nodeMeetsRequirement: Bool {
-        guard let nodeVersion else { return false }
-        return nodeVersion >= Version(22, 0, 0)
-    }
+    var ccrPath: String? { runtime.ccrPath }
+    var nodePath: String? { runtime.nodePath }
+    var nodeVersion: Version? { runtime.nodeVersion }
+    var nodeVersionString: String? { runtime.nodeVersionString }
+    var nodeRuntimeDescription: String? { runtime.nodeRuntimeDescription }
+    var loginPath: String? { runtime.loginPath }
+    var lastError: String? { runtime.issue?.message }
 
-    var environment: [String: String]? {
-        guard let loginPath else { return nil }
-        return ["PATH": loginPath]
-    }
+    var isCCRInstalled: Bool { runtime.isCCRInstalled }
+    var isNodeInstalled: Bool { runtime.isNodeInstalled }
+    var isCCRApp: Bool { runtime.isCCRApp }
+    var nodeMeetsRequirement: Bool { runtime.nodeMeetsRequirement }
+    var canRunCCR: Bool { runtime.canRun }
+    var environment: [String: String]? { runtime.environment }
 
     func refresh() {
-        loginPath = queryLoginPath()
-        ccrPath = resolveCCRExecutable()
-        nodePath = resolveExecutable(named: "node")
-
-        if let nodePath {
-            let result = CommandRunner.run(executable: nodePath, arguments: ["--version"])
-            let trimmed = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
-            nodeVersionString = trimmed.isEmpty ? nil : trimmed
-            nodeVersion = trimmed.isEmpty ? nil : Version(trimmed)
-        } else {
-            nodeVersionString = nil
-            nodeVersion = nil
+        let loginPath = queryLoginPath()
+        let candidates = resolveCCRCandidates()
+        let normalCandidate = candidates.first {
+            URL(fileURLWithPath: $0).lastPathComponent != "ccr-app"
         }
+        let desktopCandidate = candidates.first {
+            URL(fileURLWithPath: $0).lastPathComponent == "ccr-app"
+        }
+        let normalRuntime = resolveCompatibleNodeRuntime(loginPath: loginPath)
 
-        if ccrPath == nil {
-            lastError = "ccr was not found in the login shell PATH."
-        } else if isCCRApp {
-            // Desktop app ships its own bundled Node runtime via Electron.
-            lastError = nil
-        } else if nodePath == nil {
-            lastError = "Node.js was not found in the login shell PATH."
-        } else if !nodeMeetsRequirement {
-            lastError = "Node.js 22+ is required (found \(nodeVersionString ?? "unknown"))."
+        if let normalCandidate, let normalRuntime,
+           normalRuntime.version >= Self.minimumNodeVersion {
+            runtime = CCRRuntime(
+                ccrPath: normalCandidate,
+                nodePath: normalRuntime.path,
+                nodeVersion: normalRuntime.version,
+                nodeVersionString: normalRuntime.versionString,
+                source: .system,
+                loginPath: loginPath,
+                issue: nil
+            )
+        } else if let desktopCandidate,
+                  let bundledRuntime = resolveBundledNodeRuntime(at: desktopCandidate) {
+            runtime = CCRRuntime(
+                ccrPath: desktopCandidate,
+                nodePath: bundledRuntime.path,
+                nodeVersion: bundledRuntime.version,
+                nodeVersionString: bundledRuntime.versionString,
+                source: .desktop,
+                loginPath: loginPath,
+                issue: nil
+            )
+        } else if let desktopCandidate {
+            runtime = CCRRuntime(
+                ccrPath: desktopCandidate,
+                nodePath: nil,
+                nodeVersion: nil,
+                nodeVersionString: nil,
+                source: .desktop,
+                loginPath: loginPath,
+                issue: .desktopRuntimeUnavailable
+            )
+        } else if let normalCandidate {
+            let issue: CCRRuntime.Issue
+            if let normalRuntime {
+                issue = .unsupportedNode(normalRuntime.versionString)
+            } else {
+                issue = .nodeNotFound
+            }
+
+            runtime = CCRRuntime(
+                ccrPath: normalCandidate,
+                nodePath: normalRuntime?.path,
+                nodeVersion: normalRuntime?.version,
+                nodeVersionString: normalRuntime?.versionString,
+                source: .system,
+                loginPath: loginPath,
+                issue: issue
+            )
         } else {
-            lastError = nil
+            runtime = CCRRuntime(
+                ccrPath: nil,
+                nodePath: nil,
+                nodeVersion: nil,
+                nodeVersionString: nil,
+                source: .unavailable,
+                loginPath: loginPath,
+                issue: .ccrNotFound
+            )
         }
     }
 
-    private func resolveCCRExecutable() -> String? {
+    private func resolveCCRCandidates() -> [String] {
+        var candidates: [String] = []
         if let path = resolveExecutable(named: "ccr") {
-            return path
+            candidates.append(path)
         }
-        return resolveExecutable(named: "ccr-app")
+        if let path = resolveExecutable(named: "ccr-app") {
+            candidates.append(path)
+        }
+
+        let knownPaths = [
+            NSHomeDirectory() + "/.claude-code-router/bin/ccr-app",
+            "/usr/local/bin/ccr",
+            "/opt/homebrew/bin/ccr"
+        ]
+        candidates += knownPaths.filter {
+            FileManager.default.isExecutableFile(atPath: $0)
+        }
+
+        var uniqueCandidates: [String] = []
+        for candidate in candidates where !uniqueCandidates.contains(candidate) {
+            uniqueCandidates.append(candidate)
+        }
+        return uniqueCandidates
     }
 
     private func queryLoginPath() -> String? {
@@ -71,5 +131,142 @@ final class CCRExecutableResolver: ObservableObject {
         guard result.exitCode == 0 else { return nil }
         let path = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
         return path.isEmpty ? nil : path
+    }
+
+    private struct NodeRuntime {
+        let path: String
+        let version: Version
+        let versionString: String
+    }
+
+    private func resolveCompatibleNodeRuntime(loginPath: String?) -> NodeRuntime? {
+        var candidatePaths: [String] = []
+
+        if let path = resolveExecutable(named: "node") {
+            candidatePaths.append(path)
+        }
+
+        if let loginPath {
+            candidatePaths += loginPath
+                .split(separator: ":")
+                .map(String.init)
+                .map { URL(fileURLWithPath: $0).appendingPathComponent("node").path }
+        }
+
+        let home = NSHomeDirectory()
+        candidatePaths += [
+            "/opt/homebrew/bin/node",
+            "/usr/local/bin/node",
+            home + "/.volta/bin/node",
+            home + "/.asdf/shims/node",
+            home + "/.local/share/mise/shims/node",
+            home + "/.nvm/current/bin/node"
+        ]
+
+        candidatePaths += nodeExecutables(
+            in: home + "/.nvm/versions/node",
+            relativePath: "bin/node"
+        )
+        candidatePaths += nodeExecutables(
+            in: home + "/.local/share/fnm/node-versions",
+            relativePath: "installation/bin/node"
+        )
+        candidatePaths += nodeExecutables(
+            in: home + "/.fnm/node-versions",
+            relativePath: "installation/bin/node"
+        )
+        candidatePaths += nodeExecutables(
+            in: home + "/.asdf/installs/nodejs",
+            relativePath: "bin/node"
+        )
+        candidatePaths += nodeExecutables(
+            in: home + "/.local/share/mise/installs/node",
+            relativePath: "bin/node"
+        )
+
+        let uniquePaths = Set(candidatePaths)
+        let runtimes = uniquePaths.compactMap { makeNodeRuntime(at: $0) }
+
+        let sortedRuntimes = runtimes.sorted { lhs, rhs in
+            if lhs.version != rhs.version {
+                return lhs.version > rhs.version
+            }
+            return lhs.path < rhs.path
+        }
+
+        // Prefer the newest runtime that satisfies CCR's requirement. If there
+        // is no compatible installation, retain the newest one for diagnostics.
+        return sortedRuntimes.first(where: {
+            $0.version >= Self.minimumNodeVersion
+        }) ?? sortedRuntimes.first
+    }
+
+    private func nodeExecutables(in directory: String, relativePath: String) -> [String] {
+        guard let entries = try? FileManager.default.contentsOfDirectory(atPath: directory) else {
+            return []
+        }
+
+        return entries.map {
+            URL(fileURLWithPath: directory)
+                .appendingPathComponent($0)
+                .appendingPathComponent(relativePath)
+                .path
+        }
+    }
+
+    private func makeNodeRuntime(at path: String) -> NodeRuntime? {
+        guard FileManager.default.isExecutableFile(atPath: path) else { return nil }
+
+        let result = CommandRunner.run(executable: path, arguments: ["--version"])
+        guard result.exitCode == 0 else { return nil }
+
+        let versionString = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let version = Version(versionString) else { return nil }
+
+        return NodeRuntime(path: path, version: version, versionString: versionString)
+    }
+
+    private func resolveBundledNodeRuntime(at ccrPath: String) -> NodeRuntime? {
+        guard let wrapper = try? String(
+            contentsOf: URL(fileURLWithPath: ccrPath),
+            encoding: .utf8
+        ) else {
+            return nil
+        }
+
+        var runtimePaths: [String] = []
+        let marker = "ELECTRON_RUN_AS_NODE=1 exec '"
+        if let markerRange = wrapper.range(of: marker) {
+            let remainder = wrapper[markerRange.upperBound...]
+            if let end = remainder.firstIndex(of: "'") {
+                runtimePaths.append(String(remainder[..<end]))
+            }
+        }
+
+        runtimePaths.append(
+            "/Applications/Claude Code Router.app/Contents/MacOS/Claude Code Router"
+        )
+
+        for runtimePath in Set(runtimePaths) {
+            guard FileManager.default.isExecutableFile(atPath: runtimePath) else { continue }
+
+            let result = CommandRunner.run(
+                executable: runtimePath,
+                arguments: ["-p", "process.version"],
+                environment: ["ELECTRON_RUN_AS_NODE": "1"]
+            )
+            guard result.exitCode == 0 else { continue }
+
+            let versionString = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
+            if let version = Version(versionString) {
+                return NodeRuntime(
+                    path: runtimePath,
+                    version: version,
+                    versionString: versionString
+                )
+            }
+        }
+
+        return nil
     }
 }

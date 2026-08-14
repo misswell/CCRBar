@@ -10,10 +10,11 @@ struct MenuBarView: View {
                 status: appState.statusMonitor.status,
                 gatewayUp: appState.statusMonitor.gatewayUp,
                 managementUp: appState.statusMonitor.managementUp,
-                nodeVersion: appState.resolver.nodeVersionString
+                nodeRuntimeDescription: appState.resolver.nodeRuntimeDescription,
+                managementPort: appState.managementPortValue
             )
 
-            if appState.resolver.lastError != nil {
+            if appState.resolver.runtime.issue != nil {
                 Divider()
                 setupErrorSection
             }
@@ -29,33 +30,54 @@ struct MenuBarView: View {
 
             Button("Start CCR") {
                 Task {
-                    await appState.serviceManager.start()
+                    await appState.serviceManager.start(
+                        port: appState.managementPortValue,
+                        startGateway: !appState.statusMonitor.gatewayUp
+                    )
                 }
             }
-            .disabled(!appState.resolver.isCCRInstalled || appState.serviceManager.isBusy)
+            .disabled(!appState.resolver.canRunCCR || appState.serviceManager.isBusy)
 
             Button("Open Dashboard") {
-                appState.serviceManager.openDashboard()
+                appState.serviceManager.openDashboard(port: appState.managementPortValue)
             }
-            .disabled(!appState.resolver.isCCRInstalled)
+            .disabled(!appState.resolver.canRunCCR)
 
             Button("Restart CCR") {
                 Task {
-                    await appState.serviceManager.restart()
+                    await appState.serviceManager.restart(port: appState.managementPortValue)
                 }
             }
-            .disabled(!appState.resolver.isCCRInstalled || appState.serviceManager.isBusy)
+            .disabled(!appState.resolver.canRunCCR || appState.serviceManager.isBusy)
 
             Button("Stop CCR") {
                 Task {
                     await appState.serviceManager.stop()
                 }
             }
-            .disabled(!appState.resolver.isCCRInstalled || appState.serviceManager.isBusy)
+            .disabled(!appState.resolver.canRunCCR || appState.serviceManager.isBusy)
 
             Divider()
 
             Toggle("Start CCR at App Launch", isOn: $appState.autoStartCCR)
+            HStack {
+                Text("Management Port")
+                Spacer()
+                TextField(
+                    "3458",
+                    value: $appState.managementPort,
+                    format: .number
+                )
+                .multilineTextAlignment(.trailing)
+                .frame(width: 72)
+                .textFieldStyle(.roundedBorder)
+                .onSubmit {
+                    appState.managementPortChanged()
+                }
+            }
+            Text("CCR management UI and status port; changes restart CCR")
+                .font(.caption)
+                .foregroundStyle(.secondary)
             Toggle("Launch App at Login", isOn: $appState.launchAtLogin)
                 .onChange(of: appState.launchAtLogin) { _, newValue in
                     do {
@@ -101,23 +123,8 @@ struct MenuBarView: View {
 
     @ViewBuilder
     private var setupErrorSection: some View {
-        if !appState.resolver.isCCRApp {
-            if !appState.resolver.isNodeInstalled {
-                Label("Node.js 22+ Required", systemImage: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.red)
-                Text("Node.js 22 or newer is required to run CCR.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            } else if !appState.resolver.nodeMeetsRequirement {
-                Label("Node.js \(appState.resolver.nodeVersionString ?? "?") detected", systemImage: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.red)
-                Text("Node.js 22+ is required.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-
-        if !appState.resolver.isCCRInstalled {
+        switch appState.resolver.runtime.issue {
+        case .ccrNotFound:
             Text("CCR Not Installed")
                 .fontWeight(.semibold)
             Text("npm install -g @musistudio/claude-code-router")
@@ -131,6 +138,26 @@ struct MenuBarView: View {
                 }
                 Spacer()
             }
+        case .nodeNotFound:
+            Label("Node.js 22+ Required", systemImage: "exclamationmark.triangle.fill")
+                .foregroundStyle(.red)
+            Text("Node.js 22 or newer is required to run CCR.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        case .unsupportedNode(let version):
+            Label("Node.js \(version) detected", systemImage: "exclamationmark.triangle.fill")
+                .foregroundStyle(.red)
+            Text("Node.js 22+ is required.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        case .desktopRuntimeUnavailable:
+            Label("CCR Desktop Runtime Unavailable", systemImage: "exclamationmark.triangle.fill")
+                .foregroundStyle(.red)
+            Text("The desktop app's bundled Node.js runtime could not be detected.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        case nil:
+            EmptyView()
         }
     }
 }

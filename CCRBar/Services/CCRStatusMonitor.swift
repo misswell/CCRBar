@@ -10,12 +10,15 @@ final class CCRStatusMonitor: ObservableObject {
 
     private var monitorTask: Task<Void, Never>?
     private var isChecking = false
+    private var managementPort = AppSettings.defaultManagementPort
 
-    func start() {
+    func start(managementPort: UInt16) {
+        self.managementPort = managementPort
         guard monitorTask == nil else { return }
         monitorTask = Task { [weak self] in
             while !Task.isCancelled {
-                await self?.check()
+                guard let self else { return }
+                await self.check()
                 try? await Task.sleep(nanoseconds: 3_000_000_000)
             }
         }
@@ -32,13 +35,17 @@ final class CCRStatusMonitor: ObservableObject {
         }
     }
 
-    func check() async {
+    func check(managementPort: UInt16? = nil) async {
         guard !isChecking else { return }
         isChecking = true
         defer { isChecking = false }
 
+        if let managementPort {
+            self.managementPort = managementPort
+        }
+
         async let gateway = checkPort(3456)
-        async let management = checkPort(3458)
+        async let management = checkPort(self.managementPort)
         let (gatewayUp, managementUp) = await (gateway, management)
 
         let newStatus: CCRStatus
