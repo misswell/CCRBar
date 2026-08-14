@@ -22,9 +22,19 @@ generate_keys --account CCRBar
 
 ## 发布新版本
 
-1. 使用 Release 配置构建、签名、公证并装订 `CCRBar.app`，再将它压缩为 `.zip`。
-2. 将压缩包上传到对应的 GitHub Release，资产名称保持稳定，例如 `CCRBar-0.2.0-macos.zip`。
-3. 使用 Sparkle 的 `generate_appcast` 生成 `appcast.xml`。发布机上可以从钥匙串读取私钥：
+1. 使用 Release 配置构建并导出 `CCRBar.app`。
+2. 运行仓库内的公证脚本。它会先给 Sparkle 的 `Updater`、`Autoupdate` 和 XPC helper 重新加上 Developer ID 签名，再提交 Apple 公证、装订票据并生成最终 zip：
+
+   ```bash
+   scripts/notarize.sh \
+     /path/to/CCRBar.app \
+     /path/to/CCRBar-0.2.0-macos.zip
+   ```
+
+   `NOTARY_PROFILE` 可覆盖默认的 `notarytool` Keychain profile。不要把 Apple 密码、API 私钥或 Sparkle 私钥写入仓库。
+
+3. 将已经公证的压缩包上传到对应的 GitHub Release，资产名称保持稳定，例如 `CCRBar-0.2.0-macos.zip`。
+4. 使用 Sparkle 的 `generate_appcast` 生成 `appcast.xml`。发布机上可以从钥匙串读取私钥：
 
    ```bash
    generate_appcast --account CCRBar \
