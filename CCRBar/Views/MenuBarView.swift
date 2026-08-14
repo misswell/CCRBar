@@ -77,6 +77,10 @@ struct MenuBarView: View {
                 appState.refresh()
             }
 
+            Button("Check for Updates") {
+                appState.checkForUpdates()
+            }
+
             Divider()
 
             Button("Quit") {

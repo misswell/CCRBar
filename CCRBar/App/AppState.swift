@@ -8,6 +8,7 @@ final class AppState: ObservableObject {
     let resolver: CCRExecutableResolver
     let serviceManager: CCRServiceManager
     let statusMonitor: CCRStatusMonitor
+    let updateManager: UpdateManager
 
     @AppStorage("autoStartCCR") var autoStartCCR = false
     @AppStorage("launchAtLogin") var launchAtLogin = false
@@ -19,10 +20,12 @@ final class AppState: ObservableObject {
         resolver = CCRExecutableResolver()
         statusMonitor = CCRStatusMonitor()
         serviceManager = CCRServiceManager(resolver: resolver, statusMonitor: statusMonitor)
+        updateManager = UpdateManager()
         launchAtLogin = LoginItemManager.isEnabled
     }
 
     func start() {
+        updateManager.start()
         resolver.refresh()
         statusMonitor.start()
 
@@ -54,5 +57,9 @@ final class AppState: ObservableObject {
         Task {
             await statusMonitor.check()
         }
+    }
+
+    func checkForUpdates() {
+        updateManager.checkForUpdates()
     }
 }
