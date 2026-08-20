@@ -17,8 +17,8 @@ settings:
     ENABLE_HARDENED_RUNTIME: YES
     PRODUCT_BUNDLE_IDENTIFIER: com.ccrbar.app
     SWIFT_EMIT_LOC_STRINGS: NO
-    MARKETING_VERSION: "0.1.3"
-    CURRENT_PROJECT_VERSION: "4"
+    MARKETING_VERSION: "0.1.4"
+    CURRENT_PROJECT_VERSION: "5"
   configs:
     Release:
       CODE_SIGN_ENTITLEMENTS: CCRBar/Resources/CCRBar.entitlements
@@ -40,8 +40,8 @@ targets:
         INFOPLIST_FILE: CCRBar/Resources/Info.plist
         PRODUCT_NAME: CCRBar
         PRODUCT_BUNDLE_IDENTIFIER: com.ccrbar.app
-        MARKETING_VERSION: "0.1.3"
-        CURRENT_PROJECT_VERSION: "4"
+        MARKETING_VERSION: "0.1.4"
+        CURRENT_PROJECT_VERSION: "5"
   CCRBarTests:
     type: bundle.unit-test
     platform: macOS

@@ -31,6 +31,10 @@ npm install -g @musistudio/claude-code-router
 - 自动识别桌面版 `ccr-app` 自带的 Node.js，或从本机已安装版本中选择 Node.js 22+
 - 修改 CCR Management 端口（默认 `3458`，提交后自动重启 CCR）
 
+## 最新发布
+
+- `v0.1.4`：替换为 A2 IP 图标，更新 macOS 应用视觉资源。
+
 ### 自动识别与端口
 
 启动时会优先检测官方 `ccr` CLI；如果没有，则检测 Claude Code Router 桌面版提供的
