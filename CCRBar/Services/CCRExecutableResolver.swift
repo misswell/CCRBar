@@ -24,7 +24,7 @@ final class CCRExecutableResolver: ObservableObject {
 
     func refresh() {
         let loginPath = queryLoginPath()
-        let candidates = resolveCCRCandidates()
+        let candidates = resolveCCRCandidates(loginPath: loginPath)
         let normalCandidate = candidates.first {
             URL(fileURLWithPath: $0).lastPathComponent != "ccr-app"
         }
@@ -95,20 +95,18 @@ final class CCRExecutableResolver: ObservableObject {
         }
     }
 
-    private func resolveCCRCandidates() -> [String] {
+    private func resolveCCRCandidates(loginPath: String?) -> [String] {
+        let home = NSHomeDirectory()
+        let knownPaths = Self.knownCCRCandidatePaths(home: home)
+        let searchPaths = Self.ccrSearchPaths(home: home, loginPath: loginPath)
         var candidates: [String] = []
-        if let path = resolveExecutable(named: "ccr") {
+        if let path = resolveExecutable(named: "ccr", searchPaths: searchPaths) {
             candidates.append(path)
         }
-        if let path = resolveExecutable(named: "ccr-app") {
+        if let path = resolveExecutable(named: "ccr-app", searchPaths: searchPaths) {
             candidates.append(path)
         }
 
-        let knownPaths = [
-            NSHomeDirectory() + "/.claude-code-router/bin/ccr-app",
-            "/usr/local/bin/ccr",
-            "/opt/homebrew/bin/ccr"
-        ]
         candidates += knownPaths.filter {
             FileManager.default.isExecutableFile(atPath: $0)
         }
@@ -120,14 +118,45 @@ final class CCRExecutableResolver: ObservableObject {
         return uniqueCandidates
     }
 
+    nonisolated static func knownCCRCandidatePaths(home: String) -> [String] {
+        [
+            URL(fileURLWithPath: home)
+                .appendingPathComponent(".claude-code-router/bin/ccr-app")
+                .path,
+            "/usr/local/bin/ccr",
+            "/opt/homebrew/bin/ccr"
+        ]
+    }
+
+    nonisolated static func ccrSearchPaths(home: String, loginPath: String?) -> [String] {
+        let desktopDirectory = URL(fileURLWithPath: home)
+            .appendingPathComponent(".claude-code-router/bin")
+            .path
+        var paths = [desktopDirectory, "/usr/local/bin", "/opt/homebrew/bin"]
+        if let loginPath {
+            paths += loginPath.split(separator: ":").map(String.init)
+        }
+
+        var uniquePaths: [String] = []
+        for path in paths where !path.isEmpty && !uniquePaths.contains(path) {
+            uniquePaths.append(path)
+        }
+        return uniquePaths
+    }
+
     private func queryLoginPath() -> String? {
         let result = CommandRunner.run(executable: "/bin/zsh", arguments: ["-lc", "echo $PATH"])
         let path = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
         return path.isEmpty ? nil : path
     }
 
-    private func resolveExecutable(named name: String) -> String? {
-        let result = CommandRunner.run(executable: "/bin/zsh", arguments: ["-lc", "command -v \(name)"])
+    private func resolveExecutable(named name: String, searchPaths: [String]? = nil) -> String? {
+        let environment = searchPaths.map { ["PATH": $0.joined(separator: ":")] }
+        let result = CommandRunner.run(
+            executable: "/bin/zsh",
+            arguments: ["-lc", "command -v \(name)"],
+            environment: environment
+        )
         guard result.exitCode == 0 else { return nil }
         let path = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
         return path.isEmpty ? nil : path

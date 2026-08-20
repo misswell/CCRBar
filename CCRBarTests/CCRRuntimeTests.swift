@@ -2,6 +2,15 @@ import XCTest
 @testable import CCRBar
 
 final class CCRRuntimeTests: XCTestCase {
+    func testCCRCandidateSearchIncludesDesktopBinOutsideLoginPath() {
+        let paths = CCRExecutableResolver.ccrSearchPaths(
+            home: "/Users/test",
+            loginPath: "/usr/local/bin:/usr/bin:/bin"
+        )
+
+        XCTAssertEqual(paths.first, "/Users/test/.claude-code-router/bin")
+    }
+
     func testDesktopRuntimeUsesBundledNodeAsSingleSourceOfTruth() {
         let runtime = CCRRuntime(
             ccrPath: "/Users/test/.claude-code-router/bin/ccr-app",
