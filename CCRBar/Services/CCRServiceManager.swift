@@ -2,17 +2,33 @@ import Foundation
 import Combine
 
 @MainActor
+protocol CCRExecutableResolving: AnyObject {
+    var runtime: CCRRuntime { get }
+    var environment: [String: String]? { get }
+}
+
+extension CCRExecutableResolver: CCRExecutableResolving {}
+
+@MainActor
 final class CCRServiceManager: ObservableObject {
     @Published private(set) var isBusy = false
     @Published private(set) var lastCommand: String?
     @Published private(set) var lastResult: CommandResult?
 
-    private let resolver: CCRExecutableResolver
+    private let resolver: CCRExecutableResolving
     private let statusMonitor: CCRStatusMonitor
+    private let commandExecutor: @Sendable (String, [String], [String: String]?) -> CommandResult
 
-    init(resolver: CCRExecutableResolver, statusMonitor: CCRStatusMonitor) {
+    init(
+        resolver: CCRExecutableResolving,
+        statusMonitor: CCRStatusMonitor,
+        commandExecutor: @escaping @Sendable (String, [String], [String: String]?) -> CommandResult = {
+            CommandRunner.run(executable: $0, arguments: $1, environment: $2)
+        }
+    ) {
         self.resolver = resolver
         self.statusMonitor = statusMonitor
+        self.commandExecutor = commandExecutor
     }
 
     var lastErrorText: String? {
@@ -28,10 +44,12 @@ final class CCRServiceManager: ObservableObject {
             arguments.append("--no-gateway")
         }
         await runCommand(arguments)
+        await statusMonitor.check(managementPort: port)
     }
 
     func stop() async {
         await runCommand(["stop"])
+        await statusMonitor.check()
     }
 
     func restart(port: UInt16) async {
@@ -66,12 +84,9 @@ final class CCRServiceManager: ObservableObject {
         lastCommand = command
 
         let environment = resolver.environment
+        let commandExecutor = commandExecutor
         let result = await Task.detached(priority: .userInitiated) {
-            CommandRunner.run(
-                executable: ccrPath,
-                arguments: arguments,
-                environment: environment
-            )
+            commandExecutor(ccrPath, arguments, environment)
         }.value
 
         lastResult = result

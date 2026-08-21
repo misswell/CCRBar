@@ -9,8 +9,17 @@ final class CCRStatusMonitor: ObservableObject {
     @Published private(set) var managementUp = false
 
     private var monitorTask: Task<Void, Never>?
-    private var isChecking = false
     private var managementPort = AppSettings.defaultManagementPort
+    private var checkGeneration = 0
+    private let portChecker: @Sendable (UInt16) async -> Bool
+
+    init(
+        portChecker: @escaping @Sendable (UInt16) async -> Bool = { port in
+            await CCRStatusMonitor.checkPort(port)
+        }
+    ) {
+        self.portChecker = portChecker
+    }
 
     func start(managementPort: UInt16) {
         self.managementPort = managementPort
@@ -36,17 +45,19 @@ final class CCRStatusMonitor: ObservableObject {
     }
 
     func check(managementPort: UInt16? = nil) async {
-        guard !isChecking else { return }
-        isChecking = true
-        defer { isChecking = false }
-
         if let managementPort {
             self.managementPort = managementPort
         }
 
-        async let gateway = checkPort(3456)
-        async let management = checkPort(self.managementPort)
+        checkGeneration += 1
+        let generation = checkGeneration
+        let managementPort = self.managementPort
+
+        async let gateway = portChecker(3456)
+        async let management = portChecker(managementPort)
         let (gatewayUp, managementUp) = await (gateway, management)
+
+        guard generation == checkGeneration else { return }
 
         let newStatus: CCRStatus
         switch (gatewayUp, managementUp) {
@@ -63,7 +74,7 @@ final class CCRStatusMonitor: ObservableObject {
         self.status = newStatus
     }
 
-    private func checkPort(_ port: UInt16) async -> Bool {
+    private nonisolated static func checkPort(_ port: UInt16) async -> Bool {
         guard let endpointPort = NWEndpoint.Port(rawValue: port) else { return false }
 
         return await withCheckedContinuation { continuation in
