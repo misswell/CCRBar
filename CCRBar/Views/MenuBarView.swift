@@ -4,8 +4,47 @@ struct MenuBarView: View {
     @EnvironmentObject private var appState: AppState
     @State private var errorMessage: String?
 
+    private var productName: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
+            ?? Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
+            ?? "CCRBar"
+    }
+
+    private var appVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+            ?? "Unknown"
+    }
+
+    private var ccrIsActive: Bool {
+        switch appState.statusMonitor.status {
+        case .running, .partiallyRunning:
+            return true
+        case .stopped, .starting, .error:
+            return false
+        }
+    }
+
+    private var startDisabled: Bool {
+        !appState.resolver.canRunCCR || appState.serviceManager.isBusy || ccrIsActive
+    }
+
+    private var stopDisabled: Bool {
+        !appState.resolver.canRunCCR || appState.serviceManager.isBusy || !ccrIsActive
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(productName)
+                    .font(.headline)
+                Text("Version \(appVersion)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 4)
+
+            Divider()
+
             StatusView(
                 status: appState.statusMonitor.status,
                 gatewayUp: appState.statusMonitor.gatewayUp,
@@ -36,7 +75,7 @@ struct MenuBarView: View {
                     )
                 }
             }
-            .disabled(!appState.resolver.canRunCCR || appState.serviceManager.isBusy)
+            .disabled(startDisabled)
 
             Button("Open Dashboard") {
                 appState.serviceManager.openDashboard(port: appState.managementPortValue)
@@ -55,7 +94,7 @@ struct MenuBarView: View {
                     await appState.serviceManager.stop()
                 }
             }
-            .disabled(!appState.resolver.canRunCCR || appState.serviceManager.isBusy)
+            .disabled(stopDisabled)
 
             Divider()
 

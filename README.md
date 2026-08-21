@@ -33,6 +33,7 @@ npm install -g @musistudio/claude-code-router
 
 ## 最新发布
 
+- `v0.1.5`：菜单显示产品名和版本；`Start CCR` 与 `Stop CCR` 按当前状态互斥。
 - `v0.1.4`：替换为 A2 IP 图标，更新 macOS 应用视觉资源。
 
 ### 自动识别与端口
