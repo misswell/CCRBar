@@ -1,8 +1,8 @@
 .DS_Store
 build/
-build-offline/
-build-release/
+build-*/
 DerivedData/
 *.xcuserstate
 xcuserdata/
 .swiftpm/
+default.profraw
