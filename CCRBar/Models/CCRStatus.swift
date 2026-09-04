@@ -3,6 +3,7 @@ import SwiftUI
 enum CCRStatus: Equatable {
     case stopped
     case starting
+    case stopping
     case running
     case partiallyRunning
     case error(String)
@@ -13,6 +14,8 @@ enum CCRStatus: Equatable {
             return "Stopped"
         case .starting:
             return "Starting…"
+        case .stopping:
+            return "Stopping…"
         case .running:
             return "Running"
         case .partiallyRunning:
@@ -30,6 +33,8 @@ enum CCRStatus: Equatable {
             return "circle"
         case .starting:
             return "circle.lefthalf.filled"
+        case .stopping:
+            return "circle.lefthalf.filled"
         case .partiallyRunning:
             return "circle.lefthalf.filled"
         case .error:
@@ -44,6 +49,8 @@ enum CCRStatus: Equatable {
         case .stopped:
             return .secondary
         case .starting:
+            return .orange
+        case .stopping:
             return .orange
         case .partiallyRunning:
             return .yellow

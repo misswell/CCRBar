@@ -17,9 +17,9 @@ struct MenuBarView: View {
 
     private var ccrIsActive: Bool {
         switch appState.statusMonitor.status {
-        case .running, .partiallyRunning:
+        case .starting, .stopping, .running, .partiallyRunning:
             return true
-        case .stopped, .starting, .error:
+        case .stopped, .error:
             return false
         }
     }
@@ -29,7 +29,10 @@ struct MenuBarView: View {
     }
 
     private var stopDisabled: Bool {
-        !appState.resolver.canRunCCR || appState.serviceManager.isBusy || !ccrIsActive
+        !appState.resolver.canRunCCR
+            || appState.serviceManager.isStopping
+            || appState.statusMonitor.status == .stopping
+            || !ccrIsActive
     }
 
     var body: some View {
@@ -69,7 +72,7 @@ struct MenuBarView: View {
 
             Button("Start CCR") {
                 Task {
-                    await appState.serviceManager.start(
+                    await appState.startCCR(
                         port: appState.managementPortValue,
                         startGateway: !appState.statusMonitor.gatewayUp
                     )
@@ -84,14 +87,14 @@ struct MenuBarView: View {
 
             Button("Restart CCR") {
                 Task {
-                    await appState.serviceManager.restart(port: appState.managementPortValue)
+                    await appState.restartCCR(port: appState.managementPortValue)
                 }
             }
             .disabled(!appState.resolver.canRunCCR || appState.serviceManager.isBusy)
 
             Button("Stop CCR") {
                 Task {
-                    await appState.serviceManager.stop()
+                    await appState.stopCCR()
                 }
             }
             .disabled(stopDisabled)
@@ -105,7 +108,7 @@ struct MenuBarView: View {
                 TextField(
                     "3458",
                     value: $appState.managementPort,
-                    format: .number
+                    format: .number.grouping(.never)
                 )
                 .multilineTextAlignment(.trailing)
                 .frame(width: 72)
@@ -150,6 +153,9 @@ struct MenuBarView: View {
         }
         .padding(10)
         .frame(minWidth: 300)
+        .onAppear {
+            appState.refreshStatus()
+        }
         .alert("Error", isPresented: .init(
             get: { errorMessage != nil },
             set: { if !$0 { errorMessage = nil } }

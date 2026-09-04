@@ -91,6 +91,9 @@ struct CCRRuntime: Equatable {
 
     var nodeRuntimeDescription: String? {
         guard let nodeVersionString else { return nil }
+        if isCCRApp, nodeVersionString == "bundled" {
+            return "Bundled Node.js"
+        }
         return isCCRApp
             ? "Bundled Node.js \(nodeVersionString)"
             : "Node.js \(nodeVersionString)"

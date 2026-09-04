@@ -32,7 +32,7 @@ struct StatusView: View {
                     Text("Gateway")
                         .fontWeight(.medium)
                     Spacer()
-                    Text("127.0.0.1:3456")
+                    Text(verbatim: "127.0.0.1:3456")
                         .foregroundStyle(.secondary)
                 }
                 HStack(spacing: 6) {
@@ -42,7 +42,7 @@ struct StatusView: View {
                     Text("Management")
                         .fontWeight(.medium)
                     Spacer()
-                    Text("127.0.0.1:\(managementPort)")
+                    Text(verbatim: "127.0.0.1:\(String(managementPort))")
                         .foregroundStyle(.secondary)
                 }
             }

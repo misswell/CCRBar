@@ -33,6 +33,7 @@ npm install -g @musistudio/claude-code-router
 
 ## 最新发布
 
+- `v0.1.8`：修复 Stop 点击后服务已停止但菜单状态不刷新、以及自动启动竞态问题；修复桌面版运行时误报未安装。
 - `v0.1.5`：菜单显示产品名和版本；`Start CCR` 与 `Stop CCR` 按当前状态互斥。
 - `v0.1.4`：替换为 A2 IP 图标，更新 macOS 应用视觉资源。
 

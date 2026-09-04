@@ -3,6 +3,35 @@ import XCTest
 
 final class CCRRuntimeTests: XCTestCase {
     @MainActor
+    func testAppStatePublishesNestedStatusChanges() async {
+        let appState = AppState()
+        let expectation = expectation(description: "AppState forwards status changes")
+        let subscription = appState.objectWillChange.sink { _ in
+            expectation.fulfill()
+        }
+
+        appState.statusMonitor.setStarting()
+
+        await fulfillment(of: [expectation], timeout: 1.0)
+        withExtendedLifetime(subscription) {}
+    }
+
+    @MainActor
+    func testCancellingPendingAutoStartPreventsStart() async {
+        let coordinator = CCRAutoStartCoordinator()
+        var startCount = 0
+
+        coordinator.schedule(delayNanoseconds: 50_000_000) {
+            startCount += 1
+        }
+        coordinator.cancel()
+
+        try? await Task.sleep(nanoseconds: 150_000_000)
+
+        XCTAssertEqual(startCount, 0)
+    }
+
+    @MainActor
     func testLatestStatusCheckWinsWhenEarlierCheckIsInFlight() async {
         let probe = StatusCheckProbe()
         let statusMonitor = CCRStatusMonitor(portChecker: { port in
@@ -28,7 +57,7 @@ final class CCRRuntimeTests: XCTestCase {
     @MainActor
     func testStopRefreshesStatusAfterCommandCompletes() async {
         let resolver = TestExecutableResolver()
-        let statusMonitor = CCRStatusMonitor()
+        let statusMonitor = CCRStatusMonitor(portChecker: { _ in false })
         statusMonitor.setStarting()
         let manager = CCRServiceManager(
             resolver: resolver,

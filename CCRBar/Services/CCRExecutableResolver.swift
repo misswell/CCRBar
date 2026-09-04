@@ -31,7 +31,12 @@ final class CCRExecutableResolver: ObservableObject {
         let desktopCandidate = candidates.first {
             URL(fileURLWithPath: $0).lastPathComponent == "ccr-app"
         }
-        let normalRuntime = resolveCompatibleNodeRuntime(loginPath: loginPath)
+        // A desktop ccr-app owns its Node runtime. Do not probe every system
+        // Node installation first; a stale version-manager shim can block the
+        // menu bar app before it ever reaches the installed desktop runtime.
+        let normalRuntime = normalCandidate == nil
+            ? nil
+            : resolveCompatibleNodeRuntime(loginPath: loginPath)
 
         if let normalCandidate, let normalRuntime,
            normalRuntime.version >= Self.minimumNodeVersion {
@@ -145,21 +150,28 @@ final class CCRExecutableResolver: ObservableObject {
     }
 
     private func queryLoginPath() -> String? {
-        let result = CommandRunner.run(executable: "/bin/zsh", arguments: ["-lc", "echo $PATH"])
-        let path = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
-        return path.isEmpty ? nil : path
+        guard let path = ProcessInfo.processInfo.environment["PATH"] else { return nil }
+        let trimmedPath = path.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmedPath.isEmpty ? nil : trimmedPath
     }
 
     private func resolveExecutable(named name: String, searchPaths: [String]? = nil) -> String? {
-        let environment = searchPaths.map { ["PATH": $0.joined(separator: ":")] }
-        let result = CommandRunner.run(
-            executable: "/bin/zsh",
-            arguments: ["-lc", "command -v \(name)"],
-            environment: environment
-        )
-        guard result.exitCode == 0 else { return nil }
-        let path = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
-        return path.isEmpty ? nil : path
+        let paths = searchPaths
+            ?? ProcessInfo.processInfo.environment["PATH"]?
+                .split(separator: ":")
+                .map(String.init)
+            ?? []
+
+        for directory in paths where !directory.isEmpty {
+            let candidate = URL(fileURLWithPath: directory)
+                .appendingPathComponent(name)
+                .path
+            if FileManager.default.isExecutableFile(atPath: candidate) {
+                return candidate
+            }
+        }
+
+        return nil
     }
 
     private struct NodeRuntime {
@@ -279,21 +291,16 @@ final class CCRExecutableResolver: ObservableObject {
         for runtimePath in Set(runtimePaths) {
             guard FileManager.default.isExecutableFile(atPath: runtimePath) else { continue }
 
-            let result = CommandRunner.run(
-                executable: runtimePath,
-                arguments: ["-p", "process.version"],
-                environment: ["ELECTRON_RUN_AS_NODE": "1"]
+            // Do not launch Electron merely to probe process.version. If the
+            // desktop app is already running, Electron's single-instance lock
+            // can make that probe wait forever. The wrapper already identifies
+            // the bundled executable, and desktop CCR does not require a
+            // system Node version check.
+            return NodeRuntime(
+                path: runtimePath,
+                version: CCRRuntime.minimumNodeVersion,
+                versionString: "bundled"
             )
-            guard result.exitCode == 0 else { continue }
-
-            let versionString = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
-            if let version = Version(versionString) {
-                return NodeRuntime(
-                    path: runtimePath,
-                    version: version,
-                    versionString: versionString
-                )
-            }
         }
 
         return nil

@@ -12,12 +12,17 @@ extension CCRExecutableResolver: CCRExecutableResolving {}
 @MainActor
 final class CCRServiceManager: ObservableObject {
     @Published private(set) var isBusy = false
+    @Published private(set) var isStopping = false
     @Published private(set) var lastCommand: String?
     @Published private(set) var lastResult: CommandResult?
 
     private let resolver: CCRExecutableResolving
     private let statusMonitor: CCRStatusMonitor
     private let commandExecutor: @Sendable (String, [String], [String: String]?) -> CommandResult
+    private var operationTask: Task<Void, Never>?
+    private var operationGeneration = 0
+    private var activeOperationCount = 0
+    private var stopRequestCount = 0
 
     init(
         resolver: CCRExecutableResolving,
@@ -38,24 +43,52 @@ final class CCRServiceManager: ObservableObject {
     }
 
     func start(port: UInt16, startGateway: Bool = true) async {
-        statusMonitor.setStarting()
-        var arguments = ["start", "--port", String(port), "--no-open"]
-        if !startGateway {
-            arguments.append("--no-gateway")
+        beginOperation()
+        defer { endOperation() }
+
+        await enqueueOperation { [weak self] in
+            guard let self else { return }
+            self.statusMonitor.setStarting()
+            var arguments = ["start", "--port", String(port), "--no-open"]
+            if !startGateway {
+                arguments.append("--no-gateway")
+            }
+            await self.runCommand(arguments)
+            await self.statusMonitor.check(managementPort: port)
         }
-        await runCommand(arguments)
-        await statusMonitor.check(managementPort: port)
     }
 
     func stop() async {
-        await runCommand(["stop"])
-        await statusMonitor.check()
+        beginOperation()
+        beginStopRequest()
+        defer {
+            endStopRequest()
+            endOperation()
+        }
+
+        statusMonitor.setStopping()
+        await enqueueOperation { [weak self] in
+            guard let self else { return }
+            self.statusMonitor.setStopping()
+            await self.runCommand(["stop"])
+            await self.statusMonitor.check()
+        }
     }
 
     func restart(port: UInt16) async {
-        await stop()
-        try? await Task.sleep(nanoseconds: 500_000_000)
-        await start(port: port)
+        beginOperation()
+        defer { endOperation() }
+
+        await enqueueOperation { [weak self] in
+            guard let self else { return }
+            self.statusMonitor.setStopping()
+            await self.runCommand(["stop"])
+            await self.statusMonitor.check()
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            self.statusMonitor.setStarting()
+            await self.runCommand(["start", "--port", String(port), "--no-open"])
+            await self.statusMonitor.check(managementPort: port)
+        }
     }
 
     func openDashboard(port: UInt16) {
@@ -71,14 +104,45 @@ final class CCRServiceManager: ObservableObject {
             : CommandResult(stdout: "", stderr: "Failed to launch ccr ui", exitCode: -1)
     }
 
+    private func beginOperation() {
+        activeOperationCount += 1
+        isBusy = true
+    }
+
+    private func endOperation() {
+        activeOperationCount = max(0, activeOperationCount - 1)
+        isBusy = activeOperationCount > 0
+    }
+
+    private func beginStopRequest() {
+        stopRequestCount += 1
+        isStopping = true
+    }
+
+    private func endStopRequest() {
+        stopRequestCount = max(0, stopRequestCount - 1)
+        isStopping = stopRequestCount > 0
+    }
+
+    private func enqueueOperation(_ operation: @escaping @MainActor () async -> Void) async {
+        operationGeneration += 1
+        let generation = operationGeneration
+        let previous = operationTask
+        let current = Task { @MainActor [weak self] in
+            await previous?.value
+            await operation()
+            guard let self, self.operationGeneration == generation else { return }
+            self.operationTask = nil
+        }
+        operationTask = current
+        await current.value
+    }
+
     private func runCommand(_ arguments: [String]) async {
         guard resolver.runtime.canRun, let ccrPath = resolver.runtime.ccrPath else {
             lastResult = CommandResult(stdout: "", stderr: "ccr not installed", exitCode: -1)
             return
         }
-
-        isBusy = true
-        defer { isBusy = false }
 
         let command = "ccr \(arguments.joined(separator: " "))"
         lastCommand = command

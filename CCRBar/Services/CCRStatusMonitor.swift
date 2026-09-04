@@ -39,9 +39,13 @@ final class CCRStatusMonitor: ObservableObject {
     }
 
     func setStarting() {
-        if status != .running && status != .partiallyRunning {
-            status = .starting
-        }
+        checkGeneration += 1
+        status = .starting
+    }
+
+    func setStopping() {
+        checkGeneration += 1
+        status = .stopping
     }
 
     func check(managementPort: UInt16? = nil) async {

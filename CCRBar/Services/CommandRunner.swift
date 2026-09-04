@@ -22,7 +22,7 @@ enum CommandRunner {
         process.standardOutput = outputPipe
         process.standardError = errorPipe
 
-        var env = ProcessInfo.processInfo.environment
+        var env = sanitizedEnvironment()
         if let environment {
             for (key, value) in environment {
                 env[key] = value
@@ -57,7 +57,7 @@ enum CommandRunner {
         process.executableURL = URL(fileURLWithPath: executable)
         process.arguments = arguments
 
-        var env = ProcessInfo.processInfo.environment
+        var env = sanitizedEnvironment()
         if let environment {
             for (key, value) in environment {
                 env[key] = value
@@ -72,6 +72,17 @@ enum CommandRunner {
         } catch {
             return false
         }
+    }
+
+    private static func sanitizedEnvironment() -> [String: String] {
+        var environment = ProcessInfo.processInfo.environment
+        let injectedKeys = environment.keys.filter {
+            $0.hasPrefix("DYLD_") || $0.hasPrefix("XCTest")
+        }
+        for key in injectedKeys {
+            environment.removeValue(forKey: key)
+        }
+        return environment
     }
 
     private static var launchedProcesses: [Process] = []
