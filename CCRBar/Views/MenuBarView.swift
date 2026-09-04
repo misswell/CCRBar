@@ -132,9 +132,7 @@ struct MenuBarView: View {
             Divider()
 
             Button("Open CCR Data Folder") {
-                if let url = URL(string: NSHomeDirectory() + "/.claude-code-router") {
-                    NSWorkspace.shared.open(url)
-                }
+                openCCRDataFolder()
             }
 
             Button("Refresh") {
@@ -164,6 +162,28 @@ struct MenuBarView: View {
         } message: {
             Text(errorMessage ?? "")
         }
+    }
+
+    private func openCCRDataFolder() {
+        let path = NSHomeDirectory() + "/.claude-code-router"
+        let fileManager = FileManager.default
+        var isDirectory: ObjCBool = false
+
+        if fileManager.fileExists(atPath: path, isDirectory: &isDirectory) {
+            guard isDirectory.boolValue else {
+                errorMessage = String(localized: "CCR data path is not a folder.")
+                return
+            }
+        } else {
+            do {
+                try fileManager.createDirectory(atPath: path, withIntermediateDirectories: true)
+            } catch {
+                errorMessage = error.localizedDescription
+                return
+            }
+        }
+
+        NSWorkspace.shared.open(URL(fileURLWithPath: path, isDirectory: true))
     }
 
     @ViewBuilder

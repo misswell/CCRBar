@@ -82,7 +82,7 @@ final class CCRRuntimeTests: XCTestCase {
         XCTAssertEqual(paths.first, "/Users/test/.claude-code-router/bin")
     }
 
-    func testDesktopRuntimeUsesBundledNodeAsSingleSourceOfTruth() {
+    func testDesktopRuntimeUsesBundledNodeAsSingleSourceOfTruth() throws {
         let runtime = CCRRuntime(
             ccrPath: "/Users/test/.claude-code-router/bin/ccr-app",
             nodePath: "/Applications/Claude Code Router.app/Contents/MacOS/Claude Code Router",
@@ -95,7 +95,9 @@ final class CCRRuntimeTests: XCTestCase {
         XCTAssertTrue(runtime.canRun)
         XCTAssertTrue(runtime.isCCRApp)
         XCTAssertNil(runtime.issue)
-        XCTAssertEqual(runtime.nodeRuntimeDescription, "Bundled Node.js v24.16.0")
+        let description = try XCTUnwrap(runtime.nodeRuntimeDescription)
+        XCTAssertTrue(description.contains("v24.16.0"))
+        XCTAssertTrue(description.contains(String(localized: "Bundled Node.js")))
     }
 
     func testSystemNodeFourteenIsRejectedOnlyForSystemRuntime() {

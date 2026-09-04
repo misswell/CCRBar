@@ -1,0 +1,57 @@
+/* MenuBarView */
+"Version %@" = "版本 %@";
+"Start CCR" = "启动 CCR";
+"Open Dashboard" = "打开控制台";
+"Restart CCR" = "重启 CCR";
+"Stop CCR" = "停止 CCR";
+"Start CCR at App Launch" = "应用启动时启动 CCR";
+"Management Port" = "管理端口";
+"CCR management UI and status port; changes restart CCR" = "CCR 管理 UI 和状态端口；修改后会重启 CCR";
+"Launch App at Login" = "登录时启动应用";
+"Open CCR Data Folder" = "打开 CCR 数据文件夹";
+"Refresh" = "刷新";
+"Check for Updates" = "检查更新";
+"Quit" = "退出";
+"Error" = "错误";
+"OK" = "好";
+
+/* MenuBarView setup section */
+"CCR Not Installed" = "未安装 CCR";
+"Copy Install Command" = "复制安装命令";
+"Node.js 22+ Required" = "需要 Node.js 22+";
+"Node.js 22 or newer is required to run CCR." = "运行 CCR 需要 Node.js 22 或更高版本。";
+"Node.js %@ detected" = "检测到 Node.js %@";
+"Node.js 22+ is required." = "需要 Node.js 22 或更高版本。";
+
+/* SettingsView */
+"Updates" = "更新";
+"CCRBar checks for updates automatically once a day." = "CCRBar 每天自动检查一次更新。";
+
+/* StatusView */
+"Gateway" = "网关";
+"Management" = "管理服务";
+
+/* CCRStatus */
+"Stopped" = "已停止";
+"Starting…" = "启动中…";
+"Stopping…" = "停止中…";
+"Running" = "运行中";
+"Partially Running" = "部分运行中";
+"Error: %@" = "错误：%@";
+
+/* CCRRuntime */
+"CCR was not found in the login shell PATH." = "在登录 shell 的 PATH 中未找到 CCR。";
+"A compatible Node.js runtime was not found. Node.js 22+ is required." = "未找到兼容的 Node.js 运行时，需要 Node.js 22 或更高版本。";
+"Node.js 22+ is required (found %@)." = "需要 Node.js 22 或更高版本（当前为 %@）。";
+"CCR Desktop's bundled Node.js runtime could not be detected." = "未能检测到 CCR Desktop 自带的 Node.js 运行时。";
+"Bundled Node.js" = "内置 Node.js";
+"Bundled Node.js %@" = "内置 Node.js %@";
+"Node.js %@" = "Node.js %@";
+
+/* CCRServiceManager */
+"Command failed with exit code %lld" = "命令执行失败，退出码 %lld";
+"Failed to launch ccr ui" = "启动 ccr ui 失败";
+"ccr not installed" = "未安装 ccr";
+
+/* Data folder */
+"CCR data path is not a folder." = "CCR 数据路径不是文件夹。";

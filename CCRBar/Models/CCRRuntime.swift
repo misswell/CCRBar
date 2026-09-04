@@ -18,13 +18,13 @@ struct CCRRuntime: Equatable {
         var message: String {
             switch self {
             case .ccrNotFound:
-                return "CCR was not found in the login shell PATH."
+                return String(localized: "CCR was not found in the login shell PATH.")
             case .nodeNotFound:
-                return "A compatible Node.js runtime was not found. Node.js 22+ is required."
+                return String(localized: "A compatible Node.js runtime was not found. Node.js 22+ is required.")
             case .unsupportedNode(let version):
-                return "Node.js 22+ is required (found \(version))."
+                return String(localized: "Node.js 22+ is required (found \(version)).")
             case .desktopRuntimeUnavailable:
-                return "CCR Desktop's bundled Node.js runtime could not be detected."
+                return String(localized: "CCR Desktop's bundled Node.js runtime could not be detected.")
             }
         }
     }
@@ -92,11 +92,11 @@ struct CCRRuntime: Equatable {
     var nodeRuntimeDescription: String? {
         guard let nodeVersionString else { return nil }
         if isCCRApp, nodeVersionString == "bundled" {
-            return "Bundled Node.js"
+            return String(localized: "Bundled Node.js")
         }
         return isCCRApp
-            ? "Bundled Node.js \(nodeVersionString)"
-            : "Node.js \(nodeVersionString)"
+            ? String(localized: "Bundled Node.js \(nodeVersionString)")
+            : String(localized: "Node.js \(nodeVersionString)")
     }
 
     var environment: [String: String]? {

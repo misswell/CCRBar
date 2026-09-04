@@ -11,17 +11,17 @@ enum CCRStatus: Equatable {
     var title: String {
         switch self {
         case .stopped:
-            return "Stopped"
+            return String(localized: "Stopped")
         case .starting:
-            return "Starting…"
+            return String(localized: "Starting…")
         case .stopping:
-            return "Stopping…"
+            return String(localized: "Stopping…")
         case .running:
-            return "Running"
+            return String(localized: "Running")
         case .partiallyRunning:
-            return "Partially Running"
+            return String(localized: "Partially Running")
         case .error(let message):
-            return "Error: \(message)"
+            return String(localized: "Error: \(message)")
         }
     }
 

@@ -1,0 +1,57 @@
+/* MenuBarView */
+"Version %@" = "Version %@";
+"Start CCR" = "Start CCR";
+"Open Dashboard" = "Open Dashboard";
+"Restart CCR" = "Restart CCR";
+"Stop CCR" = "Stop CCR";
+"Start CCR at App Launch" = "Start CCR at App Launch";
+"Management Port" = "Management Port";
+"CCR management UI and status port; changes restart CCR" = "CCR management UI and status port; changes restart CCR";
+"Launch App at Login" = "Launch App at Login";
+"Open CCR Data Folder" = "Open CCR Data Folder";
+"Refresh" = "Refresh";
+"Check for Updates" = "Check for Updates";
+"Quit" = "Quit";
+"Error" = "Error";
+"OK" = "OK";
+
+/* MenuBarView setup section */
+"CCR Not Installed" = "CCR Not Installed";
+"Copy Install Command" = "Copy Install Command";
+"Node.js 22+ Required" = "Node.js 22+ Required";
+"Node.js 22 or newer is required to run CCR." = "Node.js 22 or newer is required to run CCR.";
+"Node.js %@ detected" = "Node.js %@ detected";
+"Node.js 22+ is required." = "Node.js 22+ is required.";
+
+/* SettingsView */
+"Updates" = "Updates";
+"CCRBar checks for updates automatically once a day." = "CCRBar checks for updates automatically once a day.";
+
+/* StatusView */
+"Gateway" = "Gateway";
+"Management" = "Management";
+
+/* CCRStatus */
+"Stopped" = "Stopped";
+"Starting…" = "Starting…";
+"Stopping…" = "Stopping…";
+"Running" = "Running";
+"Partially Running" = "Partially Running";
+"Error: %@" = "Error: %@";
+
+/* CCRRuntime */
+"CCR was not found in the login shell PATH." = "CCR was not found in the login shell PATH.";
+"A compatible Node.js runtime was not found. Node.js 22+ is required." = "A compatible Node.js runtime was not found. Node.js 22+ is required.";
+"Node.js 22+ is required (found %@)." = "Node.js 22+ is required (found %@).";
+"CCR Desktop's bundled Node.js runtime could not be detected." = "CCR Desktop's bundled Node.js runtime could not be detected.";
+"Bundled Node.js" = "Bundled Node.js";
+"Bundled Node.js %@" = "Bundled Node.js %@";
+"Node.js %@" = "Node.js %@";
+
+/* CCRServiceManager */
+"Command failed with exit code %lld" = "Command failed with exit code %lld";
+"Failed to launch ccr ui" = "Failed to launch ccr ui";
+"ccr not installed" = "ccr not installed";
+
+/* Data folder */
+"CCR data path is not a folder." = "CCR data path is not a folder.";

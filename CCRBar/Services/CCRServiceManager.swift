@@ -39,7 +39,9 @@ final class CCRServiceManager: ObservableObject {
     var lastErrorText: String? {
         guard let result = lastResult, result.exitCode != 0 else { return nil }
         let stderr = result.stderr.trimmingCharacters(in: .whitespacesAndNewlines)
-        return stderr.isEmpty ? "Command failed with exit code \(result.exitCode)" : stderr
+        return stderr.isEmpty
+            ? String(localized: "Command failed with exit code \(result.exitCode)")
+            : stderr
     }
 
     func start(port: UInt16, startGateway: Bool = true) async {
@@ -101,7 +103,7 @@ final class CCRServiceManager: ObservableObject {
         )
         lastResult = launched
             ? CommandResult(stdout: "", stderr: "", exitCode: 0)
-            : CommandResult(stdout: "", stderr: "Failed to launch ccr ui", exitCode: -1)
+            : CommandResult(stdout: "", stderr: String(localized: "Failed to launch ccr ui"), exitCode: -1)
     }
 
     private func beginOperation() {
@@ -140,7 +142,7 @@ final class CCRServiceManager: ObservableObject {
 
     private func runCommand(_ arguments: [String]) async {
         guard resolver.runtime.canRun, let ccrPath = resolver.runtime.ccrPath else {
-            lastResult = CommandResult(stdout: "", stderr: "ccr not installed", exitCode: -1)
+            lastResult = CommandResult(stdout: "", stderr: String(localized: "ccr not installed"), exitCode: -1)
             return
         }
 
