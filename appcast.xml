@@ -7,12 +7,12 @@
         <language>en</language>
         <item>
             <title>0.1.8</title>
-            <pubDate>Sat, 22 Aug 2026 01:00:13 +0800</pubDate>
+            <pubDate>Fri, 04 Sep 2026 09:08:35 +0800</pubDate>
             <sparkle:version>9</sparkle:version>
             <sparkle:shortVersionString>0.1.8</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://github.com/misswell/CCRBar/releases/download/v0.1.8/CCRBar-0.1.8-macos.zip" length="3309386" type="application/octet-stream" sparkle:edSignature="PIIOgslu9TKe0u6UukHX/2eoXkn89No9qofoNNR3QzUC1Re8I+xladTM7Puf6xJkJDHGh4zQWuaqRtyE0hdwCA=="/>
+            <enclosure url="https://github.com/misswell/CCRBar/releases/download/v0.1.8/CCRBar-0.1.8-macos.zip" length="3309355" type="application/octet-stream" sparkle:edSignature="RwS4T61E76+G9I7XkrBkaVo2w9sqDs57Ugf4dvvcIsF5F4XvlyUoE+8yTLXho5M/vh36gWjQgJJr0GaBAjLpDQ=="/>
         </item>
         <item>
             <title>0.1.7</title>
