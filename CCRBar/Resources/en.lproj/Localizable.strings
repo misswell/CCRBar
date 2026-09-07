@@ -22,6 +22,8 @@
 "Node.js 22 or newer is required to run CCR." = "Node.js 22 or newer is required to run CCR.";
 "Node.js %@ detected" = "Node.js %@ detected";
 "Node.js 22+ is required." = "Node.js 22+ is required.";
+"CCR Desktop Runtime Unavailable" = "CCR Desktop Runtime Unavailable";
+"The desktop app's bundled Node.js runtime could not be detected." = "The desktop app's bundled Node.js runtime could not be detected.";
 
 /* SettingsView */
 "Updates" = "Updates";

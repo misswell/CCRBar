@@ -22,6 +22,8 @@
 "Node.js 22 or newer is required to run CCR." = "运行 CCR 需要 Node.js 22 或更高版本。";
 "Node.js %@ detected" = "检测到 Node.js %@";
 "Node.js 22+ is required." = "需要 Node.js 22 或更高版本。";
+"CCR Desktop Runtime Unavailable" = "CCR 桌面版运行时不可用";
+"The desktop app's bundled Node.js runtime could not be detected." = "未能检测到桌面版自带的 Node.js 运行时。";
 
 /* SettingsView */
 "Updates" = "更新";

@@ -165,7 +165,7 @@ struct MenuBarView: View {
     }
 
     private func openCCRDataFolder() {
-        let path = NSHomeDirectory() + "/.claude-code-router"
+        let path = CCRExecutableResolver.ccrDataFolder(home: NSHomeDirectory())
         let fileManager = FileManager.default
         var isDirectory: ObjCBool = false
 

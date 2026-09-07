@@ -123,10 +123,16 @@ final class CCRExecutableResolver: ObservableObject {
         return uniqueCandidates
     }
 
+    nonisolated static func ccrDataFolder(home: String) -> String {
+        URL(fileURLWithPath: home)
+            .appendingPathComponent(".claude-code-router")
+            .path
+    }
+
     nonisolated static func knownCCRCandidatePaths(home: String) -> [String] {
         [
-            URL(fileURLWithPath: home)
-                .appendingPathComponent(".claude-code-router/bin/ccr-app")
+            URL(fileURLWithPath: ccrDataFolder(home: home))
+                .appendingPathComponent("bin/ccr-app")
                 .path,
             "/usr/local/bin/ccr",
             "/opt/homebrew/bin/ccr"
@@ -134,8 +140,8 @@ final class CCRExecutableResolver: ObservableObject {
     }
 
     nonisolated static func ccrSearchPaths(home: String, loginPath: String?) -> [String] {
-        let desktopDirectory = URL(fileURLWithPath: home)
-            .appendingPathComponent(".claude-code-router/bin")
+        let desktopDirectory = URL(fileURLWithPath: ccrDataFolder(home: home))
+            .appendingPathComponent("bin")
             .path
         var paths = [desktopDirectory, "/usr/local/bin", "/opt/homebrew/bin"]
         if let loginPath {

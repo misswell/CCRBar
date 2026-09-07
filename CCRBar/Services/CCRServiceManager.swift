@@ -40,7 +40,7 @@ final class CCRServiceManager: ObservableObject {
         guard let result = lastResult, result.exitCode != 0 else { return nil }
         let stderr = result.stderr.trimmingCharacters(in: .whitespacesAndNewlines)
         return stderr.isEmpty
-            ? String(localized: "Command failed with exit code \(result.exitCode)")
+            ? String(localized: "Command failed with exit code \(Int(result.exitCode))")
             : stderr
     }
 
