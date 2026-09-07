@@ -73,9 +73,15 @@ final class CCRStatusMonitor: ObservableObject {
             newStatus = .stopped
         }
 
-        self.gatewayUp = gatewayUp
-        self.managementUp = managementUp
-        self.status = newStatus
+        if self.gatewayUp != gatewayUp {
+            self.gatewayUp = gatewayUp
+        }
+        if self.managementUp != managementUp {
+            self.managementUp = managementUp
+        }
+        if self.status != newStatus {
+            self.status = newStatus
+        }
     }
 
     private nonisolated static func checkPort(_ port: UInt16) async -> Bool {

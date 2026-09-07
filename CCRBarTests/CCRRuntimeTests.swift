@@ -2,6 +2,48 @@ import XCTest
 @testable import CCRBar
 
 final class CCRRuntimeTests: XCTestCase {
+    func testLaunchedProcessIsReleasedAfterTermination() {
+        let baseline = CommandRunner.retainedProcessCount
+
+        XCTAssertTrue(CommandRunner.launch(executable: "/usr/bin/true", arguments: []))
+
+        let deadline = Date().addingTimeInterval(2)
+        while CommandRunner.retainedProcessCount > baseline, Date() < deadline {
+            Thread.sleep(forTimeInterval: 0.01)
+        }
+
+        XCTAssertEqual(CommandRunner.retainedProcessCount, baseline)
+    }
+
+    func testCommandOutputIsBounded() {
+        let payload = String(
+            repeating: "x",
+            count: CommandRunner.maximumCapturedOutputBytes + 1_024
+        )
+
+        let result = CommandRunner.run(
+            executable: "/usr/bin/printf",
+            arguments: [payload]
+        )
+
+        XCTAssertEqual(result.exitCode, 0)
+        XCTAssertEqual(result.stdout.utf8.count, CommandRunner.maximumCapturedOutputBytes)
+    }
+
+    @MainActor
+    func testUnchangedStatusCheckDoesNotPublish() async {
+        let statusMonitor = CCRStatusMonitor(portChecker: { _ in false })
+        var publicationCount = 0
+        let subscription = statusMonitor.objectWillChange.sink {
+            publicationCount += 1
+        }
+
+        await statusMonitor.check()
+
+        XCTAssertEqual(publicationCount, 0)
+        withExtendedLifetime(subscription) {}
+    }
+
     @MainActor
     func testAppStatePublishesNestedStatusChanges() async {
         let appState = AppState()

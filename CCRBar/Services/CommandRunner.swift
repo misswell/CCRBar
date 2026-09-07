@@ -7,6 +7,14 @@ struct CommandResult: Equatable, Sendable {
 }
 
 enum CommandRunner {
+    static let maximumCapturedOutputBytes = 64 * 1_024
+
+    static var retainedProcessCount: Int {
+        launchedProcessesLock.lock()
+        defer { launchedProcessesLock.unlock() }
+        return launchedProcesses.count
+    }
+
     @discardableResult
     static func run(
         executable: String,
@@ -32,14 +40,29 @@ enum CommandRunner {
 
         do {
             try process.run()
-            process.waitUntilExit()
 
-            let stdoutData = outputPipe.fileHandleForReading.readDataToEndOfFile()
-            let stderrData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+            let outputCapture = BoundedOutputCapture(limit: maximumCapturedOutputBytes)
+            let errorCapture = BoundedOutputCapture(limit: maximumCapturedOutputBytes)
+            let captureGroup = DispatchGroup()
+
+            captureGroup.enter()
+            DispatchQueue.global(qos: .utility).async {
+                outputCapture.readToEnd(from: outputPipe.fileHandleForReading)
+                captureGroup.leave()
+            }
+
+            captureGroup.enter()
+            DispatchQueue.global(qos: .utility).async {
+                errorCapture.readToEnd(from: errorPipe.fileHandleForReading)
+                captureGroup.leave()
+            }
+
+            process.waitUntilExit()
+            captureGroup.wait()
 
             return CommandResult(
-                stdout: String(data: stdoutData, encoding: .utf8) ?? "",
-                stderr: String(data: stderrData, encoding: .utf8) ?? "",
+                stdout: outputCapture.string,
+                stderr: errorCapture.string,
                 exitCode: process.terminationStatus
             )
         } catch {
@@ -65,13 +88,32 @@ enum CommandRunner {
         }
         process.environment = env
 
+        let identifier = ObjectIdentifier(process)
+        process.terminationHandler = { _ in
+            removeLaunchedProcess(identifier)
+        }
+        retainLaunchedProcess(process, identifier: identifier)
+
         do {
             try process.run()
-            launchedProcesses.append(process)
             return true
         } catch {
+            process.terminationHandler = nil
+            removeLaunchedProcess(identifier)
             return false
         }
+    }
+
+    private static func retainLaunchedProcess(_ process: Process, identifier: ObjectIdentifier) {
+        launchedProcessesLock.lock()
+        defer { launchedProcessesLock.unlock() }
+        launchedProcesses[identifier] = process
+    }
+
+    private static func removeLaunchedProcess(_ identifier: ObjectIdentifier) {
+        launchedProcessesLock.lock()
+        defer { launchedProcessesLock.unlock() }
+        launchedProcesses.removeValue(forKey: identifier)
     }
 
     private static func sanitizedEnvironment() -> [String: String] {
@@ -85,5 +127,37 @@ enum CommandRunner {
         return environment
     }
 
-    private static var launchedProcesses: [Process] = []
+    private static let launchedProcessesLock = NSLock()
+    private static var launchedProcesses: [ObjectIdentifier: Process] = [:]
+}
+
+private final class BoundedOutputCapture: @unchecked Sendable {
+    private let limit: Int
+    private var data = Data()
+
+    init(limit: Int) {
+        self.limit = limit
+        data.reserveCapacity(limit)
+    }
+
+    func readToEnd(from fileHandle: FileHandle) {
+        while let chunk = try? fileHandle.read(upToCount: 16 * 1_024),
+              !chunk.isEmpty {
+            let remainingCapacity = limit - data.count
+            if remainingCapacity > 0 {
+                data.append(chunk.prefix(remainingCapacity))
+            }
+        }
+    }
+
+    var string: String {
+        var validData = data
+        while !validData.isEmpty {
+            if let value = String(data: validData, encoding: .utf8) {
+                return value
+            }
+            validData.removeLast()
+        }
+        return ""
+    }
 }
