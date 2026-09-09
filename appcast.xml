@@ -6,6 +6,15 @@
         <description>Updates for CCRBar</description>
         <language>en</language>
         <item>
+            <title>0.1.13</title>
+            <pubDate>Wed, 09 Sep 2026 09:13:20 +0800</pubDate>
+            <sparkle:version>14</sparkle:version>
+            <sparkle:shortVersionString>0.1.13</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/misswell/CCRBar/releases/download/v0.1.13/CCRBar-0.1.13-macos.zip" length="3322988" type="application/octet-stream" sparkle:edSignature="I9sPGo3Rk+71bbgqLsvtLSLNrzqSE2KzUfPY3Pkskn6b9z5e+WA9cLzcOf2jxgIfUg0FSunsqwlC2dPDnzUDAA=="/>
+        </item>
+        <item>
             <title>0.1.12</title>
             <pubDate>Wed, 09 Sep 2026 08:52:44 +0800</pubDate>
             <sparkle:version>13</sparkle:version>
