@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#111521" />
     <meta
       name="description"
-      content="CCRBar 是一个原生 macOS 菜单栏控制器，用更短的路径管理 Claude Code Router。"
+      content="CCRBar 是一个原生 macOS 菜单栏控制器：不用常驻 WebView/Electron 渲染器，也能轻量管理 Claude Code Router。"
     />
     <link rel="icon" type="image/png" href="assets/ccrbar-icon.png" />
     <link rel="stylesheet" href="styles.css" />
@@ -58,11 +58,11 @@
     <main id="main">
       <section class="hero shell" id="top">
         <div class="hero-copy" data-reveal>
-          <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> NATIVE MACOS CONTROL / v0.1.12</p>
+          <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> NATIVE MACOS CONTROL / v0.1.13</p>
           <h1>把 CCR<br /><em>放到菜单栏。</em></h1>
           <p class="hero-lede">
-            CCRBar 是一个轻量的原生 macOS 菜单栏控制器。启动、停止、重启 Claude Code Router，
-            以及确认两个端口是否在线，都不必再切回终端。
+            只想看状态或重启 CCR，不必为此常驻一套 WebView/Electron 渲染器。CCRBar 用原生 SwiftUI
+            提供轻量控制层；需要完整界面时，再按需打开 CCR Dashboard。
           </p>
           <div class="hero-actions">
             <a class="button button-primary" href="https://github.com/misswell/CCRBar/releases/latest" target="_blank" rel="noreferrer">
@@ -74,7 +74,7 @@
           </div>
           <div class="hero-proof" aria-label="产品特点">
             <span><i class="proof-dot proof-blue" aria-hidden="true"></i>纯 SwiftUI</span>
-            <span><i class="proof-dot proof-amber" aria-hidden="true"></i>无 Electron</span>
+            <span><i class="proof-dot proof-amber" aria-hidden="true"></i>不常驻 WebView</span>
             <span><i class="proof-dot proof-mint" aria-hidden="true"></i>Apple 公证</span>
           </div>
         </div>
@@ -125,21 +125,21 @@
       <section class="section section-light" id="features">
         <div class="shell feature-layout">
           <div class="section-intro" data-reveal>
-            <p class="section-index">/ 01 — THE SHORTCUT</p>
-            <h2>控制要近，<br /><span>状态要清楚。</span></h2>
+            <p class="section-index">/ 01 — WHY CCRBAR</p>
+            <h2>不为一盏状态灯，<br /><span>常驻一套 WebView。</span></h2>
             <p>
-              CCRBar 不重写 Claude Code Router，只把每天会用到的控制和反馈，放到菜单栏这一层。
-              你可以继续使用 CCR 原本的能力，同时少一次终端切换。
+              CCRBar 不重写 Claude Code Router，只把每天会用到的控制和反馈，收进原生 SwiftUI 菜单栏窗口。
+              你可以继续使用 CCR 原本的能力，同时少一套不必要的渲染器常驻开销。
             </p>
           </div>
 
           <div class="feature-grid">
             <article class="feature-card feature-card-wide" data-reveal>
-              <div class="card-index">01 / CONTROL</div>
+              <div class="card-index">01 / LIGHTWEIGHT</div>
               <div class="card-icon card-icon-cross" aria-hidden="true">↻</div>
-              <h3>启停，一键完成</h3>
-              <p>从菜单栏启动、停止或重启 CCR；需要管理界面时，直接打开 CCR Dashboard。</p>
-              <div class="card-footer"><span>START</span><span>RESTART</span><span>STOP</span></div>
+              <h3>只带控制，不带渲染器</h3>
+              <p>CCRBar 自身不加载 WebView，也不把 CCR Dashboard 嵌进菜单栏；只保留查看状态、启停服务和打开入口所需的原生控制层。</p>
+              <div class="card-footer"><span>SWIFTUI</span><span>NO WEBVIEW</span><span>LOW RESIDENT OVERHEAD</span></div>
             </article>
 
             <article class="feature-card feature-card-dark" data-reveal data-delay="80">

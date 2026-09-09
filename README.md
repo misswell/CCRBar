@@ -6,11 +6,15 @@
 
 **原生 macOS 菜单栏控制器，管理 [Claude Code Router (CCR)](https://github.com/musistudio/claude-code-router)。**
 
-无 Electron、无 Tauri、无 WebView —— 一个纯 SwiftUI 的轻量菜单栏应用，把 CCR 的启停、状态监控和常用入口收进菜单栏。已通过 Apple 公证，支持 Sparkle 自动更新，界面跟随系统语言（中文 / English）。
+CCRBar 主要解决一个很具体的问题：只想查看状态、启停 CCR 时，不必为此常驻一套 WebView/Electron 渲染器。它本身无 Electron、无 Tauri、无 WebView，使用纯 SwiftUI 把 CCR 的启停、状态监控和常用入口收进菜单栏。已通过 Apple 公证，支持 Sparkle 自动更新，界面跟随系统语言（中文 / English）。
 
 [![Latest Release](https://img.shields.io/github/v/release/misswell/CCRBar?display_name=tag&logo=github)](https://github.com/misswell/CCRBar/releases/latest)
 ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-black?logo=apple&logoColor=white)
 ![Native SwiftUI](https://img.shields.io/badge/SwiftUI-native-blue?logo=swift)
+
+## 为什么要 CCRBar
+
+如果只是查看 CCR 状态或重启服务，常驻一个 WebView 控制界面会带来不必要的内存开销。CCRBar 用原生 SwiftUI 提供菜单栏控制层，不加载 WebView，也不嵌入 CCR Dashboard；需要完整管理界面时，再按需打开 CCR 原有 Dashboard。
 
 ## 下载安装
 
@@ -42,6 +46,7 @@ npm install -g @musistudio/claude-code-router
 ## 设计原则
 
 - 不使用 Electron / Tauri / Chromium / WKWebView
+- 控制层保持原生、轻量，避免为菜单栏入口常驻 WebView 渲染器
 - 不重写 Claude Code Router，只做启停 + 状态监控 + 快捷入口
 - CCR 官方 CLI 是唯一的核心逻辑来源
 
@@ -57,6 +62,7 @@ Gateway 端口仍由 CCR 自身配置管理，默认是 `3456`。
 
 ## 最近更新
 
+- `v0.1.13`：明确 CCRBar 以避免 WebView/Electron 常驻渲染器内存开销为主要目标。
 - `v0.1.12`：新增 CCRBar 产品官网，补充下载入口与运行时识别说明。
 - `v0.1.11`：降低长期运行的内存增长——及时回收 Dashboard 子进程、限制命令输出缓存，并减少无变化状态的重复刷新。
 - `v0.1.10`：本地化修复——命令失败错误信息在中文系统正确显示；补齐两条桌面版运行时提示的翻译。
@@ -107,7 +113,7 @@ CCRBar/
 
 ## English
 
-CCRBar is a **native macOS menu bar app** for controlling [Claude Code Router](https://github.com/musistudio/claude-code-router) — start/stop, live gateway & management status, quick access to the dashboard and data folder. Built with pure SwiftUI (no Electron, no WebView), notarized by Apple, with Sparkle-based auto updates. The UI follows your system language (English / 简体中文).
+CCRBar is a **native macOS menu bar app** for controlling [Claude Code Router](https://github.com/musistudio/claude-code-router) — start/stop, live gateway & management status, quick access to the dashboard and data folder. It exists so you do not have to keep a WebView/Electron renderer resident just to check CCR or restart the service: CCRBar's own control surface is pure SwiftUI, with no Electron, no WebView, and no embedded dashboard. The full CCR Dashboard opens only when you ask for it. It is notarized by Apple, uses Sparkle for automatic updates, and follows your system language (English / 简体中文).
 
 **Install:** grab the latest zip from [Releases](https://github.com/misswell/CCRBar/releases/latest), drag `CCRBar.app` into `/Applications`, and you're set. Requires macOS 14+ and the CCR CLI or desktop app.
 
