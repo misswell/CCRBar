@@ -3,6 +3,7 @@ import SwiftUI
 struct MenuBarView: View {
     @EnvironmentObject private var appState: AppState
     @State private var errorMessage: String?
+    @State private var confirmCCRUpdate = false
 
     private var productName: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
@@ -131,6 +132,10 @@ struct MenuBarView: View {
 
             Divider()
 
+            ccrUpdateSection
+
+            Divider()
+
             Button("Open CCR Data Folder") {
                 openCCRDataFolder()
             }
@@ -161,6 +166,81 @@ struct MenuBarView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(errorMessage ?? "")
+        }
+        .confirmationDialog("Update CCR?", isPresented: $confirmCCRUpdate, titleVisibility: .visible) {
+            Button("Update CCR") {
+                Task {
+                    await appState.updateCCR()
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will run npm install -g @musistudio/claude-code-router@latest.")
+        }
+    }
+
+    @ViewBuilder
+    private var ccrUpdateSection: some View {
+        switch appState.ccrUpdateManager.status {
+        case .idle, .unavailable:
+            Button("Check for CCR Updates") {
+                Task {
+                    await appState.checkForCCRUpdates()
+                }
+            }
+        case .checking:
+            ProgressView("Checking CCR for updates…")
+                .controlSize(.small)
+        case .available(let current, let latest):
+            VStack(alignment: .leading, spacing: 4) {
+                Label("CCR Update Available", systemImage: "arrow.down.circle")
+                Text("Version \(current) → \(latest)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Button("Update CCR") {
+                    confirmCCRUpdate = true
+                }
+            }
+        case .upToDate(let version):
+            HStack {
+                Text("CCR \(version) is up to date")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Button("Check Again") {
+                    Task {
+                        await appState.checkForCCRUpdates()
+                    }
+                }
+            }
+        case .updating:
+            ProgressView("Updating CCR…")
+                .controlSize(.small)
+        case .updated(let version):
+            VStack(alignment: .leading, spacing: 4) {
+                Label("CCR Updated", systemImage: "checkmark.circle")
+                    .foregroundStyle(.green)
+                Text("Now using version \(version)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        case .desktopManaged:
+            Text("CCR Desktop manages its own updates.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        case .failed(let message):
+            VStack(alignment: .leading, spacing: 4) {
+                Label("CCR Update Failed", systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.red)
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Button("Try Again") {
+                    Task {
+                        await appState.checkForCCRUpdates()
+                    }
+                }
+            }
         }
     }
 

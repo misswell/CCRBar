@@ -12,16 +12,22 @@ struct Version: Comparable, CustomStringConvertible {
     }
 
     init?(_ string: String) {
-        let cleaned = string
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .replacingOccurrences(of: "v", with: "")
+        guard let candidate = string.split(whereSeparator: { character in
+            !(character.isNumber || character == ".")
+        }).first(where: { candidate in
+            let parts = candidate.split(separator: ".")
+            return !parts.isEmpty
+                && parts.count <= 3
+                && parts.allSatisfy { Int($0) != nil }
+        }) else {
+            return nil
+        }
 
-        let parts = cleaned.split(separator: ".").compactMap { Int($0) }
-        guard !parts.isEmpty, parts.count <= 3 else { return nil }
+        let parts = candidate.split(separator: ".")
 
-        major = parts[0]
-        minor = parts.count > 1 ? parts[1] : 0
-        patch = parts.count > 2 ? parts[2] : 0
+        major = Int(parts[0])!
+        minor = parts.count > 1 ? Int(parts[1])! : 0
+        patch = parts.count > 2 ? Int(parts[2])! : 0
     }
 
     static func < (lhs: Version, rhs: Version) -> Bool {

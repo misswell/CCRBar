@@ -57,3 +57,21 @@
 
 /* Data folder */
 "CCR data path is not a folder." = "CCR data path is not a folder.";
+
+/* CCR updates */
+"Check for CCR Updates" = "Check for CCR Updates";
+"Checking CCR for updates…" = "Checking CCR for updates…";
+"CCR Update Available" = "CCR Update Available";
+"Version %@ → %@" = "Version %@ → %@";
+"Update CCR" = "Update CCR";
+"Update CCR?" = "Update CCR?";
+"Cancel" = "Cancel";
+"This will run npm install -g @musistudio/claude-code-router@latest." = "This will run npm install -g @musistudio/claude-code-router@latest.";
+"CCR %@ is up to date" = "CCR %@ is up to date";
+"Check Again" = "Check Again";
+"Updating CCR…" = "Updating CCR…";
+"CCR Updated" = "CCR Updated";
+"Now using version %@" = "Now using version %@";
+"CCR Desktop manages its own updates." = "CCR Desktop manages its own updates.";
+"CCR Update Failed" = "CCR Update Failed";
+"Try Again" = "Try Again";

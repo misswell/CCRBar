@@ -31,6 +31,7 @@ CCRBar 主要解决一个很具体的问题：只想查看状态、启停 CCR �
 - 打开 CCR 数据目录（`~/.claude-code-router`）
 - 登录启动（SMAppService）+ App 启动时自动拉起 CCR
 - 在线更新（Sparkle，每天自动检查一次，可手动检查）
+- 检测并更新 CCR CLI 本体（从 npm 查询最新版本，执行前需确认）
 - 自动识别桌面版 `ccr-app` 自带的 Node.js，或从本机已安装版本中选择 Node.js 22+
 - 修改 CCR Management 端口（默认 `3458`，提交后自动重启 CCR）
 
@@ -62,6 +63,7 @@ Gateway 端口仍由 CCR 自身配置管理，默认是 `3456`。
 
 ## 最近更新
 
+- `v0.1.14`：新增 CCR CLI 本体版本检测与更新；桌面版提示由 CCR Desktop 自行管理更新。
 - `v0.1.13`：明确 CCRBar 以避免 WebView/Electron 常驻渲染器内存开销为主要目标。
 - `v0.1.12`：新增 CCRBar 产品官网，补充下载入口与运行时识别说明。
 - `v0.1.11`：降低长期运行的内存增长——及时回收 Dashboard 子进程、限制命令输出缓存，并减少无变化状态的重复刷新。
@@ -93,6 +95,7 @@ CCRBar/
 │   ├── CCRExecutableResolver.swift
 │   ├── CCRServiceManager.swift
 │   ├── CCRStatusMonitor.swift
+│   ├── CCRUpdateManager.swift
 │   ├── CommandRunner.swift
 │   ├── LoginItemManager.swift
 │   └── UpdateManager.swift

@@ -57,3 +57,21 @@
 
 /* Data folder */
 "CCR data path is not a folder." = "CCR 数据路径不是文件夹。";
+
+/* CCR updates */
+"Check for CCR Updates" = "检查 CCR 更新";
+"Checking CCR for updates…" = "正在检查 CCR 更新…";
+"CCR Update Available" = "CCR 有可用更新";
+"Version %@ → %@" = "版本 %@ → %@";
+"Update CCR" = "更新 CCR";
+"Update CCR?" = "更新 CCR？";
+"Cancel" = "取消";
+"This will run npm install -g @musistudio/claude-code-router@latest." = "将执行 npm install -g @musistudio/claude-code-router@latest。";
+"CCR %@ is up to date" = "CCR %@ 已是最新版本";
+"Check Again" = "再次检查";
+"Updating CCR…" = "正在更新 CCR…";
+"CCR Updated" = "CCR 已更新";
+"Now using version %@" = "当前版本 %@";
+"CCR Desktop manages its own updates." = "CCR Desktop 由自身更新机制管理。";
+"CCR Update Failed" = "CCR 更新失败";
+"Try Again" = "重试";

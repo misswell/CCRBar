@@ -42,6 +42,7 @@ final class AppState: ObservableObject {
     let serviceManager: CCRServiceManager
     let statusMonitor: CCRStatusMonitor
     let updateManager: UpdateManager
+    let ccrUpdateManager: CCRUpdateManager
 
     @AppStorage("autoStartCCR") var autoStartCCR = true
     @AppStorage("launchAtLogin") var launchAtLogin = false
@@ -66,6 +67,7 @@ final class AppState: ObservableObject {
         statusMonitor = CCRStatusMonitor()
         serviceManager = CCRServiceManager(resolver: resolver, statusMonitor: statusMonitor)
         updateManager = UpdateManager()
+        ccrUpdateManager = CCRUpdateManager(resolver: resolver)
 
         // Preserve an explicit old opt-out, while making the new default apply
         // to existing installs that never changed the setting.
@@ -80,7 +82,8 @@ final class AppState: ObservableObject {
         for publisher in [
             resolver.objectWillChange,
             serviceManager.objectWillChange,
-            statusMonitor.objectWillChange
+            statusMonitor.objectWillChange,
+            ccrUpdateManager.objectWillChange
         ] {
             publisher
                 .sink { [weak self] _ in
@@ -93,6 +96,7 @@ final class AppState: ObservableObject {
     func start() {
         updateManager.start()
         resolver.refresh()
+        Task { await ccrUpdateManager.check() }
         statusMonitor.start(managementPort: managementPortValue)
 
         if autoStartCCR && resolver.canRunCCR {
@@ -119,6 +123,7 @@ final class AppState: ObservableObject {
 
     func refresh() {
         resolver.refresh()
+        Task { await ccrUpdateManager.check() }
         refreshStatus()
     }
 
@@ -155,6 +160,14 @@ final class AppState: ObservableObject {
 
     func checkForUpdates() {
         updateManager.checkForUpdates()
+    }
+
+    func checkForCCRUpdates() async {
+        await ccrUpdateManager.check()
+    }
+
+    func updateCCR() async {
+        await ccrUpdateManager.update()
     }
 
     private func cancelPendingAutoStart() {

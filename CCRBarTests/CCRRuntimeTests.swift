@@ -156,6 +156,97 @@ final class CCRRuntimeTests: XCTestCase {
         XCTAssertFalse(runtime.isCCRApp)
         XCTAssertEqual(runtime.issue, .unsupportedNode("v14.16.0"))
     }
+
+    @MainActor
+    func testCCRUpdateCheckReportsAvailableCLIUpdate() async {
+        let resolver = TestCCRUpdateResolver(
+            runtime: CCRRuntime(
+                ccrPath: "/usr/local/bin/ccr",
+                nodePath: "/usr/local/bin/node",
+                nodeVersion: Version(22, 0, 0),
+                nodeVersionString: "v22.0.0",
+                source: .system,
+                issue: nil
+            )
+        )
+        let manager = CCRUpdateManager(
+            resolver: resolver,
+            commandExecutor: { executable, arguments, _ in
+                if executable == "/usr/local/bin/ccr" {
+                    return CommandResult(stdout: "ccr 1.2.3\n", stderr: "", exitCode: 0)
+                }
+                XCTAssertEqual(arguments, ["view", "@musistudio/claude-code-router", "version", "--json", "--silent"])
+                return CommandResult(stdout: "\"1.3.0\"\n", stderr: "", exitCode: 0)
+            }
+        )
+
+        await manager.check()
+
+        XCTAssertEqual(
+            manager.status,
+            .available(current: Version(1, 2, 3), latest: Version(1, 3, 0))
+        )
+    }
+
+    @MainActor
+    func testCCRUpdateInstallsLatestCLIAndRefreshesRuntime() async {
+        let resolver = TestCCRUpdateResolver(
+            runtime: CCRRuntime(
+                ccrPath: "/usr/local/bin/ccr",
+                nodePath: "/usr/local/bin/node",
+                nodeVersion: Version(22, 0, 0),
+                nodeVersionString: "v22.0.0",
+                source: .system,
+                issue: nil
+            )
+        )
+        let calls = LockedCommandCalls()
+        let manager = CCRUpdateManager(
+            resolver: resolver,
+            commandExecutor: { executable, arguments, _ in
+                calls.append(executable: executable, arguments: arguments)
+                switch arguments.first {
+                case "--version":
+                    return CommandResult(stdout: "1.2.3\n", stderr: "", exitCode: 0)
+                case "view":
+                    return CommandResult(stdout: "\"1.3.0\"\n", stderr: "", exitCode: 0)
+                case "install":
+                    return CommandResult(stdout: "updated\n", stderr: "", exitCode: 0)
+                default:
+                    XCTFail("Unexpected command: \(arguments)")
+                    return CommandResult(stdout: "", stderr: "", exitCode: 1)
+                }
+            }
+        )
+
+        await manager.check()
+        await manager.update()
+
+        XCTAssertEqual(manager.status, .updated(Version(1, 3, 0)))
+        XCTAssertEqual(resolver.refreshCount, 1)
+        XCTAssertTrue(calls.contains(arguments: [
+            "install", "--global", "@musistudio/claude-code-router@latest", "--no-fund", "--no-audit"
+        ]))
+    }
+
+    @MainActor
+    func testCCRDesktopReportsSelfManagedUpdates() async {
+        let resolver = TestCCRUpdateResolver(
+            runtime: CCRRuntime(
+                ccrPath: "/Users/test/.claude-code-router/bin/ccr-app",
+                nodePath: "/Applications/Claude Code Router.app/Contents/MacOS/Claude Code Router",
+                nodeVersion: Version(22, 0, 0),
+                nodeVersionString: "bundled",
+                source: .desktop,
+                issue: nil
+            )
+        )
+        let manager = CCRUpdateManager(resolver: resolver)
+
+        await manager.check()
+
+        XCTAssertEqual(manager.status, .desktopManaged)
+    }
 }
 
 private actor StatusCheckProbe {
@@ -206,4 +297,36 @@ private final class TestExecutableResolver: CCRExecutableResolving {
     )
 
     let environment: [String: String]? = nil
+}
+
+@MainActor
+private final class TestCCRUpdateResolver: CCRUpdateResolving {
+    let runtime: CCRRuntime
+    let environment: [String: String]? = ["PATH": "/usr/local/bin:/usr/bin:/bin"]
+    private(set) var refreshCount = 0
+
+    init(runtime: CCRRuntime) {
+        self.runtime = runtime
+    }
+
+    func refresh() {
+        refreshCount += 1
+    }
+}
+
+private final class LockedCommandCalls: @unchecked Sendable {
+    private let lock = NSLock()
+    private var values: [(executable: String, arguments: [String])] = []
+
+    func append(executable: String, arguments: [String]) {
+        lock.lock()
+        defer { lock.unlock() }
+        values.append((executable, arguments))
+    }
+
+    func contains(arguments expected: [String]) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return values.contains { $0.arguments == expected }
+    }
 }
