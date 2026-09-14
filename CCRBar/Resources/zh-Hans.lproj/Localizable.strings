@@ -61,9 +61,12 @@
 /* CCR updates */
 "Check for CCR Updates" = "检查 CCR 更新";
 "Checking CCR for updates…" = "正在检查 CCR 更新…";
+"CCR version unknown" = "尚未检测到 CCR 版本";
 "CCR Update Available" = "CCR 有可用更新";
 "Version %@ → %@" = "版本 %@ → %@";
 "Update CCR" = "更新 CCR";
+"Download Update" = "下载更新";
+"CCR Desktop installs its own updates; this opens the official download page." = "桌面版由 CCR 自身完成安装，这里打开官方下载页。";
 "Update CCR?" = "更新 CCR？";
 "Cancel" = "取消";
 "This will run npm install -g @musistudio/claude-code-router@latest." = "将执行 npm install -g @musistudio/claude-code-router@latest。";
@@ -72,6 +75,12 @@
 "Updating CCR…" = "正在更新 CCR…";
 "CCR Updated" = "CCR 已更新";
 "Now using version %@" = "当前版本 %@";
-"CCR Desktop manages its own updates." = "CCR Desktop 由自身更新机制管理。";
 "CCR Update Failed" = "CCR 更新失败";
 "Try Again" = "重试";
+"Installed CCR %@" = "已安装 CCR %@";
+"Unable to read the installed CCR version." = "无法读取已安装的 CCR 版本。";
+"Unable to read the installed CCR Desktop version." = "无法读取已安装的 CCR 桌面版版本。";
+"CCR runtime is unavailable." = "CCR 运行时不可用。";
+"npm was not found next to the selected Node.js runtime." = "在所选的 Node.js 运行时目录中未找到 npm。";
+"Unable to check the latest CCR version." = "无法检查 CCR 的最新版本。";
+"CCR update failed." = "CCR 更新失败。";

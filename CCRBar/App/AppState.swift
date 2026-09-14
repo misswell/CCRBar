@@ -170,6 +170,12 @@ final class AppState: ObservableObject {
         await ccrUpdateManager.update()
     }
 
+    /// Desktop CCR ships its own installer, so CCRBar points at the official
+    /// download page instead of running npm.
+    func openCCRReleases() {
+        NSWorkspace.shared.open(CCRUpdateManager.releasesPageURL)
+    }
+
     private func cancelPendingAutoStart() {
         autoStartGeneration += 1
         autoStartCoordinator.cancel()

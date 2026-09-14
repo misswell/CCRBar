@@ -61,9 +61,12 @@
 /* CCR updates */
 "Check for CCR Updates" = "Check for CCR Updates";
 "Checking CCR for updates…" = "Checking CCR for updates…";
+"CCR version unknown" = "CCR version unknown";
 "CCR Update Available" = "CCR Update Available";
 "Version %@ → %@" = "Version %@ → %@";
 "Update CCR" = "Update CCR";
+"Download Update" = "Download Update";
+"CCR Desktop installs its own updates; this opens the official download page." = "CCR Desktop installs its own updates; this opens the official download page.";
 "Update CCR?" = "Update CCR?";
 "Cancel" = "Cancel";
 "This will run npm install -g @musistudio/claude-code-router@latest." = "This will run npm install -g @musistudio/claude-code-router@latest.";
@@ -72,6 +75,12 @@
 "Updating CCR…" = "Updating CCR…";
 "CCR Updated" = "CCR Updated";
 "Now using version %@" = "Now using version %@";
-"CCR Desktop manages its own updates." = "CCR Desktop manages its own updates.";
 "CCR Update Failed" = "CCR Update Failed";
 "Try Again" = "Try Again";
+"Installed CCR %@" = "Installed CCR %@";
+"Unable to read the installed CCR version." = "Unable to read the installed CCR version.";
+"Unable to read the installed CCR Desktop version." = "Unable to read the installed CCR Desktop version.";
+"CCR runtime is unavailable." = "CCR runtime is unavailable.";
+"npm was not found next to the selected Node.js runtime." = "npm was not found next to the selected Node.js runtime.";
+"Unable to check the latest CCR version." = "Unable to check the latest CCR version.";
+"CCR update failed." = "CCR update failed.";

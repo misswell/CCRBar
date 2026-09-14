@@ -230,22 +230,148 @@ final class CCRRuntimeTests: XCTestCase {
     }
 
     @MainActor
-    func testCCRDesktopReportsSelfManagedUpdates() async {
+    func testCCRDesktopDetectsInstalledVersionAndAvailableUpdate() async throws {
+        let bundlePath = try makeTemporaryDesktopAppBundle(version: "3.1.0")
+        defer { try? FileManager.default.removeItem(atPath: bundlePath) }
+
         let resolver = TestCCRUpdateResolver(
             runtime: CCRRuntime(
                 ccrPath: "/Users/test/.claude-code-router/bin/ccr-app",
-                nodePath: "/Applications/Claude Code Router.app/Contents/MacOS/Claude Code Router",
+                nodePath: bundlePath + "/Contents/MacOS/Claude Code Router",
                 nodeVersion: Version(22, 0, 0),
                 nodeVersionString: "bundled",
                 source: .desktop,
                 issue: nil
             )
         )
-        let manager = CCRUpdateManager(resolver: resolver)
+        let manager = CCRUpdateManager(
+            resolver: resolver,
+            commandExecutor: { _, _, _ in
+                XCTFail("Desktop update checks must not run the CLI or npm")
+                return CommandResult(stdout: "", stderr: "", exitCode: 1)
+            },
+            releaseVersionProvider: { Version(3, 2, 0) }
+        )
 
         await manager.check()
 
-        XCTAssertEqual(manager.status, .desktopManaged)
+        XCTAssertEqual(
+            manager.status,
+            .available(current: Version(3, 1, 0), latest: Version(3, 2, 0))
+        )
+        XCTAssertFalse(manager.canInstallAvailableUpdate)
+    }
+
+    @MainActor
+    func testCCRDesktopReportsUpToDateAgainstReleaseFeed() async throws {
+        let bundlePath = try makeTemporaryDesktopAppBundle(version: "3.1.0")
+        defer { try? FileManager.default.removeItem(atPath: bundlePath) }
+
+        let resolver = TestCCRUpdateResolver(
+            runtime: CCRRuntime(
+                ccrPath: "/Users/test/.claude-code-router/bin/ccr-app",
+                nodePath: bundlePath + "/Contents/MacOS/Claude Code Router",
+                nodeVersion: Version(22, 0, 0),
+                nodeVersionString: "bundled",
+                source: .desktop,
+                issue: nil
+            )
+        )
+        let manager = CCRUpdateManager(
+            resolver: resolver,
+            commandExecutor: { _, _, _ in
+                XCTFail("Desktop update checks must not run the CLI or npm")
+                return CommandResult(stdout: "", stderr: "", exitCode: 1)
+            },
+            releaseVersionProvider: { Version(3, 1, 0) }
+        )
+
+        await manager.check()
+
+        XCTAssertEqual(manager.status, .upToDate(Version(3, 1, 0)))
+    }
+
+    @MainActor
+    func testCCRUpdateFallsBackToReleaseFeedWhenNpmFails() async {
+        let resolver = TestCCRUpdateResolver(
+            runtime: CCRRuntime(
+                ccrPath: "/usr/local/bin/ccr",
+                nodePath: "/usr/local/bin/node",
+                nodeVersion: Version(22, 0, 0),
+                nodeVersionString: "v22.0.0",
+                source: .system,
+                issue: nil
+            )
+        )
+        let manager = CCRUpdateManager(
+            resolver: resolver,
+            commandExecutor: { _, arguments, _ in
+                if arguments == ["--version"] {
+                    return CommandResult(stdout: "1.2.3\n", stderr: "", exitCode: 0)
+                }
+                return CommandResult(stdout: "", stderr: "npm unavailable", exitCode: 1)
+            },
+            releaseVersionProvider: { Version(1, 3, 0) }
+        )
+
+        await manager.check()
+
+        XCTAssertEqual(
+            manager.status,
+            .available(current: Version(1, 2, 3), latest: Version(1, 3, 0))
+        )
+        XCTAssertTrue(manager.canInstallAvailableUpdate)
+    }
+
+    @MainActor
+    func testCCRUpdateKeepsInstalledVersionWhenLatestLookupFails() async {
+        let resolver = TestCCRUpdateResolver(
+            runtime: CCRRuntime(
+                ccrPath: "/usr/local/bin/ccr",
+                nodePath: "/usr/local/bin/node",
+                nodeVersion: Version(22, 0, 0),
+                nodeVersionString: "v22.0.0",
+                source: .system,
+                issue: nil
+            )
+        )
+        let manager = CCRUpdateManager(
+            resolver: resolver,
+            commandExecutor: { _, arguments, _ in
+                if arguments == ["--version"] {
+                    return CommandResult(stdout: "1.2.3\n", stderr: "", exitCode: 0)
+                }
+                return CommandResult(stdout: "", stderr: "offline", exitCode: 1)
+            },
+            releaseVersionProvider: { nil }
+        )
+
+        await manager.check()
+
+        XCTAssertEqual(manager.installedVersion, Version(1, 2, 3))
+        guard case .failed = manager.status else {
+            return XCTFail("Expected a failed check, got \(manager.status)")
+        }
+    }
+
+    private func makeTemporaryDesktopAppBundle(version: String) throws -> String {
+        let bundle = FileManager.default.temporaryDirectory
+            .appendingPathComponent("ccrbar-tests-\(UUID().uuidString)")
+            .appendingPathComponent("Claude Code Router.app")
+        let contents = bundle.appendingPathComponent("Contents")
+        try FileManager.default.createDirectory(at: contents, withIntermediateDirectories: true)
+
+        let plist: [String: Any] = [
+            "CFBundleShortVersionString": version,
+            "CFBundleVersion": version
+        ]
+        let data = try PropertyListSerialization.data(
+            fromPropertyList: plist,
+            format: .xml,
+            options: 0
+        )
+        try data.write(to: contents.appendingPathComponent("Info.plist"))
+        return bundle.path
     }
 }
 

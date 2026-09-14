@@ -139,6 +139,65 @@ final class CCRExecutableResolver: ObservableObject {
         ]
     }
 
+    /// Walks up from an executable inside a macOS app bundle and returns the
+    /// enclosing `.app` path, if there is one. This lets CCRBar read the
+    /// version of a desktop CCR installation without launching Electron.
+    nonisolated static func enclosingAppBundlePath(forExecutable path: String) -> String? {
+        var url = URL(fileURLWithPath: path)
+        while url.pathComponents.count > 1 {
+            if url.pathExtension == "app" {
+                return url.path
+            }
+            url.deleteLastPathComponent()
+        }
+        return nil
+    }
+
+    /// Resolves the installed `Claude Code Router.app` bundle for a desktop
+    /// runtime. Prefers the running runtime's own bundle, then the `ccr-app`
+    /// wrapper, then the standard install locations.
+    nonisolated static func desktopAppBundlePath(ccrPath: String?, nodePath: String?) -> String? {
+        if let nodePath,
+           let bundlePath = enclosingAppBundlePath(forExecutable: nodePath) {
+            return bundlePath
+        }
+
+        if let ccrPath,
+           let wrapper = try? String(contentsOfFile: ccrPath, encoding: .utf8) {
+            let marker = "ELECTRON_RUN_AS_NODE=1 exec '"
+            if let markerRange = wrapper.range(of: marker) {
+                let remainder = wrapper[markerRange.upperBound...]
+                if let end = remainder.firstIndex(of: "'"),
+                   let bundlePath = enclosingAppBundlePath(forExecutable: String(remainder[..<end])) {
+                    return bundlePath
+                }
+            }
+        }
+
+        let candidates = [
+            "/Applications/Claude Code Router.app",
+            URL(fileURLWithPath: NSHomeDirectory())
+                .appendingPathComponent("Applications/Claude Code Router.app")
+                .path
+        ]
+        return candidates.first {
+            FileManager.default.fileExists(atPath: $0)
+        }
+    }
+
+    nonisolated static func appBundleShortVersion(at path: String) -> Version? {
+        let infoPath = URL(fileURLWithPath: path)
+            .appendingPathComponent("Contents/Info.plist")
+            .path
+        guard let data = FileManager.default.contents(atPath: infoPath),
+              let plist = try? PropertyListSerialization.propertyList(from: data, format: nil),
+              let dictionary = plist as? [String: Any],
+              let versionString = dictionary["CFBundleShortVersionString"] as? String else {
+            return nil
+        }
+        return Version(versionString)
+    }
+
     nonisolated static func ccrSearchPaths(home: String, loginPath: String?) -> [String] {
         let desktopDirectory = URL(fileURLWithPath: ccrDataFolder(home: home))
             .appendingPathComponent("bin")
