@@ -34,6 +34,7 @@ CCRBar 主要解决一个很具体的问题：只想查看状态、启停 CCR �
 - 检测 CCR 本体更新：CLI 从 npm 查询最新版并一键更新（执行前需确认），桌面版读取已安装 `Claude Code Router.app` 的版本并与官方发布对比后提供下载入口
 - 自动识别桌面版 `ccr-app` 自带的 Node.js，或从本机已安装版本中选择 Node.js 22+
 - 修改 CCR Management 端口（默认 `3458`，提交后自动重启 CCR）
+- 修改 Gateway 监听地址（默认 `127.0.0.1`，提交后自动重启 CCR）
 
 ## 环境要求
 
@@ -59,10 +60,13 @@ npm install -g @musistudio/claude-code-router
 版本，仅为 CCR 进程临时调整 PATH，不会修改用户的 shell 配置。
 
 菜单栏里的 `Management Port` 对应 CCR 的管理服务端口（CLI 的 `--port` 参数），默认是 `3458`。
-Gateway 端口仍由 CCR 自身配置管理，默认是 `3456`。
+`Gateway Host` 对应 Gateway 的监听地址，默认是 `127.0.0.1`；要允许局域网访问，可填写本机局域网 IP（例如 `172.16.80.3`），或填写 `0.0.0.0` 监听所有网卡。Gateway 端口仍由 CCR 自身配置管理，默认是 `3456`。
+
+远程请求仍需提供 CCR 配置的 API Key；在浏览器中直接打开 `/v1` 看到 `401` 属于认证未通过，不代表端口未监听。
 
 ## 最近更新
 
+- `v0.1.16`：新增 Gateway 监听地址设置；可绑定局域网 IP 或 `0.0.0.0`，保存后自动重启 CCR，并按配置地址监测 Gateway 状态。
 - `v0.1.15`：修复 CCR 本体更新检测——桌面版不再只显示「自行更新」，而是读取已安装的 `Claude Code Router.app` 版本并与官方最新版对比；CCR 版本与更新状态常驻菜单面板顶部，CLI 的 npm 查询失败时回退到官方发布源。
 - `v0.1.14`：新增 CCR CLI 本体版本检测与更新；桌面版提示由 CCR Desktop 自行管理更新。
 - `v0.1.13`：明确 CCRBar 以避免 WebView/Electron 常驻渲染器内存开销为主要目标。
@@ -96,6 +100,7 @@ CCRBar/
 │   ├── CCRExecutableResolver.swift
 │   ├── CCRServiceManager.swift
 │   ├── CCRStatusMonitor.swift
+│   ├── CCRWebConfigurationClient.swift
 │   ├── CCRUpdateManager.swift
 │   ├── CommandRunner.swift
 │   ├── LoginItemManager.swift

@@ -125,6 +125,23 @@ struct MenuBarView: View {
             Text("CCR management UI and status port; changes restart CCR")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            HStack {
+                Text("Gateway Host")
+                Spacer()
+                TextField(
+                    "127.0.0.1",
+                    text: $appState.gatewayHost
+                )
+                .multilineTextAlignment(.trailing)
+                .frame(width: 140)
+                .textFieldStyle(.roundedBorder)
+                .onSubmit {
+                    appState.gatewayHostChanged()
+                }
+            }
+            Text("Gateway API listen address (port 3456); changes restart CCR")
+                .font(.caption)
+                .foregroundStyle(.secondary)
             Toggle("Launch App at Login", isOn: $appState.launchAtLogin)
                 .onChange(of: appState.launchAtLogin) { _, newValue in
                     do {

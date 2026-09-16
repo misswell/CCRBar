@@ -47,6 +47,7 @@ final class AppState: ObservableObject {
     @AppStorage("autoStartCCR") var autoStartCCR = true
     @AppStorage("launchAtLogin") var launchAtLogin = false
     @AppStorage(AppSettings.managementPortKey) private var storedManagementPort = Int(AppSettings.defaultManagementPort)
+    @AppStorage(AppSettings.gatewayHostKey) var gatewayHost = AppSettings.defaultGatewayHost
 
     private let autoStartCoordinator = CCRAutoStartCoordinator()
     private var autoStartGeneration = 0
@@ -60,6 +61,10 @@ final class AppState: ObservableObject {
 
     var managementPortValue: UInt16 {
         AppSettings.validatedManagementPort(managementPort)
+    }
+
+    var gatewayHostValue: String {
+        AppSettings.validatedGatewayHost(gatewayHost)
     }
 
     init() {
@@ -97,7 +102,14 @@ final class AppState: ObservableObject {
         updateManager.start()
         resolver.refresh()
         Task { await ccrUpdateManager.check() }
-        statusMonitor.start(managementPort: managementPortValue)
+        statusMonitor.start(
+            managementPort: managementPortValue,
+            gatewayHost: gatewayHostValue
+        )
+
+        Task { @MainActor [weak self] in
+            await self?.synchronizeGatewayHost()
+        }
 
         if autoStartCCR && resolver.canRunCCR {
             statusMonitor.setStarting()
@@ -116,7 +128,10 @@ final class AppState: ObservableObject {
         ) { [weak self] _ in
             Task { @MainActor in
                 guard let self else { return }
-                await self.statusMonitor.check(managementPort: self.managementPortValue)
+                await self.statusMonitor.check(
+                    managementPort: self.managementPortValue,
+                    gatewayHost: self.gatewayHostValue
+                )
             }
         })
     }
@@ -129,13 +144,20 @@ final class AppState: ObservableObject {
 
     func refreshStatus() {
         Task {
-            await statusMonitor.check(managementPort: managementPortValue)
+            await statusMonitor.check(
+                managementPort: managementPortValue,
+                gatewayHost: gatewayHostValue
+            )
         }
     }
 
     func startCCR(port: UInt16, startGateway: Bool) async {
         cancelPendingAutoStart()
-        await serviceManager.start(port: port, startGateway: startGateway)
+        await serviceManager.start(
+            port: port,
+            gatewayHost: gatewayHostValue,
+            startGateway: startGateway
+        )
     }
 
     func stopCCR() async {
@@ -145,16 +167,39 @@ final class AppState: ObservableObject {
 
     func restartCCR(port: UInt16) async {
         cancelPendingAutoStart()
-        await serviceManager.restart(port: port)
+        await serviceManager.restart(port: port, gatewayHost: gatewayHostValue)
     }
 
     func managementPortChanged() {
         let port = managementPortValue
         let wasRunning = statusMonitor.status != .stopped
         Task {
-            await statusMonitor.check(managementPort: port)
+            await statusMonitor.check(
+                managementPort: port,
+                gatewayHost: gatewayHostValue
+            )
             guard wasRunning else { return }
             await restartCCR(port: port)
+        }
+    }
+
+    func gatewayHostChanged() {
+        gatewayHost = AppSettings.validatedGatewayHost(gatewayHost)
+        let host = gatewayHostValue
+        let managementIsUp = statusMonitor.managementUp
+
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.statusMonitor.check(
+                managementPort: self.managementPortValue,
+                gatewayHost: host
+            )
+            guard managementIsUp else { return }
+            _ = await self.serviceManager.updateGatewayHost(host)
+            await self.statusMonitor.check(
+                managementPort: self.managementPortValue,
+                gatewayHost: host
+            )
         }
     }
 
@@ -183,12 +228,22 @@ final class AppState: ObservableObject {
 
     private func startAutomaticallyIfNeeded(generation: Int) async {
         guard generation == autoStartGeneration, !Task.isCancelled else { return }
-        await statusMonitor.check(managementPort: managementPortValue)
+        await synchronizeGatewayHost()
+        await statusMonitor.check(
+            managementPort: managementPortValue,
+            gatewayHost: gatewayHostValue
+        )
         guard generation == autoStartGeneration, !Task.isCancelled else { return }
         guard statusMonitor.status != .running else { return }
         await serviceManager.start(
             port: managementPortValue,
+            gatewayHost: gatewayHostValue,
             startGateway: !statusMonitor.gatewayUp
         )
+    }
+
+    private func synchronizeGatewayHost() async {
+        guard let configuredHost = await serviceManager.currentGatewayHost() else { return }
+        gatewayHost = AppSettings.validatedGatewayHost(configuredHost)
     }
 }

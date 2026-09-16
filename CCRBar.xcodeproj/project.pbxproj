@@ -16,6 +16,7 @@
 		3F9FC617C3A4E8CC1816E3EF /* CCRStatusMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D960EECE423CEDF386E3BF49 /* CCRStatusMonitor.swift */; };
 		6260548F3420472F5E17BA5A /* CCRExecutableResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2D2F81A24C06B7506407B3 /* CCRExecutableResolver.swift */; };
 		949690612203324F360046FB /* CCRServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF5BE96D05DFDEC79DC4E96 /* CCRServiceManager.swift */; };
+		9674E1CB489C610F89F833C4 /* CCRWebConfigurationClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E7541EE32AE56B1EA86956 /* CCRWebConfigurationClient.swift */; };
 		A1F5FBC4665AFAFC4EE8DB2D /* CCRRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C57DB5B8CCAE2D211A9AEF /* CCRRuntime.swift */; };
 		AA2925BC20D14EF2709A14FD /* CCRBarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01A6D7981EE08FA4F561C1EB /* CCRBarApp.swift */; };
 		ABF7C633C1C61A4C3D36A6BE /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473893C4C897CDCA8335C08C /* Version.swift */; };
@@ -64,6 +65,7 @@
 		D69BF5A23EB31E5D1793BAA5 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		D960EECE423CEDF386E3BF49 /* CCRStatusMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRStatusMonitor.swift; sourceTree = "<group>"; };
 		E0DEE50C79214DFB2D099FB0 /* CCRBarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CCRBarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1E7541EE32AE56B1EA86956 /* CCRWebConfigurationClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCRWebConfigurationClient.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +174,7 @@
 				CDF5BE96D05DFDEC79DC4E96 /* CCRServiceManager.swift */,
 				D960EECE423CEDF386E3BF49 /* CCRStatusMonitor.swift */,
 				3337AC61C0B58F1B1B619315 /* CCRUpdateManager.swift */,
+				E1E7541EE32AE56B1EA86956 /* CCRWebConfigurationClient.swift */,
 				8C92FD81D84C0FAB58CFE335 /* CommandRunner.swift */,
 				873FB3692983A52EA30111B0 /* LoginItemManager.swift */,
 				4BB8718600A79DA140082EF0 /* UpdateManager.swift */,
@@ -289,6 +292,7 @@
 				BA0A6F1C53DC4CE8921E7DC3 /* CCRStatus.swift in Sources */,
 				3F9FC617C3A4E8CC1816E3EF /* CCRStatusMonitor.swift in Sources */,
 				34A30750BCA6775DE524E9DA /* CCRUpdateManager.swift in Sources */,
+				9674E1CB489C610F89F833C4 /* CCRWebConfigurationClient.swift in Sources */,
 				AF2075E8A21ECD27603DF935 /* CommandRunner.swift in Sources */,
 				F5EF8E7F7A1A306D8F139472 /* LoginItemManager.swift in Sources */,
 				3F78C91B296F737A80D0381B /* MenuBarView.swift in Sources */,
@@ -344,13 +348,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				INFOPLIST_FILE = CCRBar/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.15;
+				MARKETING_VERSION = 0.1.16;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ccrbar.app;
 				PRODUCT_NAME = CCRBar;
 				SDKROOT = macosx;
@@ -362,13 +366,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				INFOPLIST_FILE = CCRBar/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.15;
+				MARKETING_VERSION = 0.1.16;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ccrbar.app;
 				PRODUCT_NAME = CCRBar;
 				SDKROOT = macosx;
@@ -413,7 +417,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = U8U443D7ZL;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -428,7 +432,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.15;
+				MARKETING_VERSION = 0.1.16;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ccrbar.app;
@@ -478,7 +482,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -498,7 +502,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.15;
+				MARKETING_VERSION = 0.1.16;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;

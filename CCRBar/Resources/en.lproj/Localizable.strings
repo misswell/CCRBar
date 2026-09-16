@@ -7,6 +7,8 @@
 "Start CCR at App Launch" = "Start CCR at App Launch";
 "Management Port" = "Management Port";
 "CCR management UI and status port; changes restart CCR" = "CCR management UI and status port; changes restart CCR";
+"Gateway Host" = "Gateway Host";
+"Gateway API listen address (port 3456); changes restart CCR" = "Gateway API listen address (port 3456); changes restart CCR";
 "Launch App at Login" = "Launch App at Login";
 "Open CCR Data Folder" = "Open CCR Data Folder";
 "Refresh" = "Refresh";
@@ -54,6 +56,12 @@
 "Command failed with exit code %lld" = "Command failed with exit code %lld";
 "Failed to launch ccr ui" = "Failed to launch ccr ui";
 "ccr not installed" = "ccr not installed";
+"CCR service descriptor is unavailable." = "CCR service descriptor is unavailable.";
+"CCR service URL is invalid." = "CCR service URL is invalid.";
+"CCR service authentication token is unavailable." = "CCR service authentication token is unavailable.";
+"CCR returned an invalid configuration response." = "CCR returned an invalid configuration response.";
+"Unable to reach the CCR management service." = "Unable to reach the CCR management service.";
+"CCR configuration request failed." = "CCR configuration request failed.";
 
 /* Data folder */
 "CCR data path is not a folder." = "CCR data path is not a folder.";

@@ -18,6 +18,7 @@ final class CCRServiceManager: ObservableObject {
 
     private let resolver: CCRExecutableResolving
     private let statusMonitor: CCRStatusMonitor
+    private let gatewayConfigurationManager: CCRGatewayConfigurationManaging
     private let commandExecutor: @Sendable (String, [String], [String: String]?) -> CommandResult
     private var operationTask: Task<Void, Never>?
     private var operationGeneration = 0
@@ -27,12 +28,14 @@ final class CCRServiceManager: ObservableObject {
     init(
         resolver: CCRExecutableResolving,
         statusMonitor: CCRStatusMonitor,
+        gatewayConfigurationManager: CCRGatewayConfigurationManaging? = nil,
         commandExecutor: @escaping @Sendable (String, [String], [String: String]?) -> CommandResult = {
             CommandRunner.run(executable: $0, arguments: $1, environment: $2)
         }
     ) {
         self.resolver = resolver
         self.statusMonitor = statusMonitor
+        self.gatewayConfigurationManager = gatewayConfigurationManager ?? CCRWebConfigurationClient()
         self.commandExecutor = commandExecutor
     }
 
@@ -44,7 +47,11 @@ final class CCRServiceManager: ObservableObject {
             : stderr
     }
 
-    func start(port: UInt16, startGateway: Bool = true) async {
+    func start(
+        port: UInt16,
+        gatewayHost: String = AppSettings.defaultGatewayHost,
+        startGateway: Bool = true
+    ) async {
         beginOperation()
         defer { endOperation() }
 
@@ -55,8 +62,34 @@ final class CCRServiceManager: ObservableObject {
             if !startGateway {
                 arguments.append("--no-gateway")
             }
-            await self.runCommand(arguments)
-            await self.statusMonitor.check(managementPort: port)
+            let started = await self.runCommand(arguments)
+            await self.finishStarting(
+                managementPort: port,
+                gatewayHost: gatewayHost,
+                commandSucceeded: started,
+                updateGateway: startGateway
+            )
+        }
+    }
+
+    func currentGatewayHost() async -> String? {
+        try? await gatewayConfigurationManager.currentGatewayHost()
+    }
+
+    @discardableResult
+    func updateGatewayHost(_ host: String) async -> Bool {
+        do {
+            try await gatewayConfigurationManager.updateGatewayHost(host)
+            lastResult = CommandResult(stdout: "", stderr: "", exitCode: 0)
+            return true
+        } catch {
+            lastCommand = "CCR Gateway configuration"
+            lastResult = CommandResult(
+                stdout: "",
+                stderr: error.localizedDescription,
+                exitCode: -1
+            )
+            return false
         }
     }
 
@@ -72,25 +105,48 @@ final class CCRServiceManager: ObservableObject {
         await enqueueOperation { [weak self] in
             guard let self else { return }
             self.statusMonitor.setStopping()
-            await self.runCommand(["stop"])
+            _ = await self.runCommand(["stop"])
             await self.statusMonitor.check()
         }
     }
 
-    func restart(port: UInt16) async {
+    func restart(
+        port: UInt16,
+        gatewayHost: String = AppSettings.defaultGatewayHost
+    ) async {
         beginOperation()
         defer { endOperation() }
 
         await enqueueOperation { [weak self] in
             guard let self else { return }
             self.statusMonitor.setStopping()
-            await self.runCommand(["stop"])
+            _ = await self.runCommand(["stop"])
             await self.statusMonitor.check()
             try? await Task.sleep(nanoseconds: 500_000_000)
             self.statusMonitor.setStarting()
-            await self.runCommand(["start", "--port", String(port), "--no-open"])
-            await self.statusMonitor.check(managementPort: port)
+            let started = await self.runCommand(["start", "--port", String(port), "--no-open"])
+            await self.finishStarting(
+                managementPort: port,
+                gatewayHost: gatewayHost,
+                commandSucceeded: started,
+                updateGateway: true
+            )
         }
+    }
+
+    private func finishStarting(
+        managementPort: UInt16,
+        gatewayHost: String,
+        commandSucceeded: Bool,
+        updateGateway: Bool
+    ) async {
+        if commandSucceeded && updateGateway {
+            _ = await updateGatewayHost(gatewayHost)
+        }
+        await statusMonitor.check(
+            managementPort: managementPort,
+            gatewayHost: gatewayHost
+        )
     }
 
     func openDashboard(port: UInt16) {
@@ -140,10 +196,10 @@ final class CCRServiceManager: ObservableObject {
         await current.value
     }
 
-    private func runCommand(_ arguments: [String]) async {
+    private func runCommand(_ arguments: [String]) async -> Bool {
         guard resolver.runtime.canRun, let ccrPath = resolver.runtime.ccrPath else {
             lastResult = CommandResult(stdout: "", stderr: String(localized: "ccr not installed"), exitCode: -1)
-            return
+            return false
         }
 
         let command = "ccr \(arguments.joined(separator: " "))"
@@ -156,5 +212,6 @@ final class CCRServiceManager: ObservableObject {
         }.value
 
         lastResult = result
+        return result.exitCode == 0
     }
 }

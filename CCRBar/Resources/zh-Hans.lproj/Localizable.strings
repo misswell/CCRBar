@@ -7,6 +7,8 @@
 "Start CCR at App Launch" = "应用启动时启动 CCR";
 "Management Port" = "管理端口";
 "CCR management UI and status port; changes restart CCR" = "CCR 管理 UI 和状态端口；修改后会重启 CCR";
+"Gateway Host" = "网关监听地址";
+"Gateway API listen address (port 3456); changes restart CCR" = "Gateway API 监听地址（端口 3456）；修改后会重启 CCR";
 "Launch App at Login" = "登录时启动应用";
 "Open CCR Data Folder" = "打开 CCR 数据文件夹";
 "Refresh" = "刷新";
@@ -54,6 +56,12 @@
 "Command failed with exit code %lld" = "命令执行失败，退出码 %lld";
 "Failed to launch ccr ui" = "启动 ccr ui 失败";
 "ccr not installed" = "未安装 ccr";
+"CCR service descriptor is unavailable." = "CCR 服务描述文件不可用。";
+"CCR service URL is invalid." = "CCR 服务 URL 无效。";
+"CCR service authentication token is unavailable." = "CCR 服务认证令牌不可用。";
+"CCR returned an invalid configuration response." = "CCR 返回了无效的配置响应。";
+"Unable to reach the CCR management service." = "无法连接 CCR 管理服务。";
+"CCR configuration request failed." = "CCR 配置请求失败。";
 
 /* Data folder */
 "CCR data path is not a folder." = "CCR 数据路径不是文件夹。";

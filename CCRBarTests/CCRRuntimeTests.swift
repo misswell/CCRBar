@@ -32,7 +32,7 @@ final class CCRRuntimeTests: XCTestCase {
 
     @MainActor
     func testUnchangedStatusCheckDoesNotPublish() async {
-        let statusMonitor = CCRStatusMonitor(portChecker: { _ in false })
+        let statusMonitor = CCRStatusMonitor(portChecker: { _, _ in false })
         var publicationCount = 0
         let subscription = statusMonitor.objectWillChange.sink {
             publicationCount += 1
@@ -42,6 +42,28 @@ final class CCRRuntimeTests: XCTestCase {
 
         XCTAssertEqual(publicationCount, 0)
         withExtendedLifetime(subscription) {}
+    }
+
+    @MainActor
+    func testStatusCheckUsesConfiguredGatewayHost() async {
+        let probe = GatewayHostProbe()
+        let statusMonitor = CCRStatusMonitor { host, port in
+            await probe.check(host: host, port: port)
+        }
+
+        await statusMonitor.check(
+            managementPort: AppSettings.defaultManagementPort,
+            gatewayHost: "172.16.80.3"
+        )
+
+        let requests = await probe.requests
+        XCTAssertTrue(requests.contains { request in
+            request.host == "172.16.80.3" && request.port == 3456
+        })
+        XCTAssertTrue(requests.contains { request in
+            request.host == AppSettings.defaultGatewayHost
+                && request.port == AppSettings.defaultManagementPort
+        })
     }
 
     @MainActor
@@ -76,7 +98,7 @@ final class CCRRuntimeTests: XCTestCase {
     @MainActor
     func testLatestStatusCheckWinsWhenEarlierCheckIsInFlight() async {
         let probe = StatusCheckProbe()
-        let statusMonitor = CCRStatusMonitor(portChecker: { port in
+        let statusMonitor = CCRStatusMonitor(portChecker: { _, port in
             await probe.check(port)
         })
 
@@ -99,7 +121,7 @@ final class CCRRuntimeTests: XCTestCase {
     @MainActor
     func testStopRefreshesStatusAfterCommandCompletes() async {
         let resolver = TestExecutableResolver()
-        let statusMonitor = CCRStatusMonitor(portChecker: { _ in false })
+        let statusMonitor = CCRStatusMonitor(portChecker: { _, _ in false })
         statusMonitor.setStarting()
         let manager = CCRServiceManager(
             resolver: resolver,
@@ -113,6 +135,92 @@ final class CCRRuntimeTests: XCTestCase {
         await manager.stop()
 
         XCTAssertEqual(statusMonitor.status, .stopped)
+    }
+
+    @MainActor
+    func testStartAppliesConfiguredGatewayHost() async {
+        let resolver = TestExecutableResolver()
+        let statusMonitor = CCRStatusMonitor(portChecker: { _, _ in false })
+        let configurationManager = TestGatewayConfigurationManager()
+        let manager = CCRServiceManager(
+            resolver: resolver,
+            statusMonitor: statusMonitor,
+            gatewayConfigurationManager: configurationManager,
+            commandExecutor: { _, arguments, _ in
+                XCTAssertEqual(arguments, ["start", "--port", "3458", "--no-open"])
+                return CommandResult(stdout: "", stderr: "", exitCode: 0)
+            }
+        )
+
+        await manager.start(port: 3458, gatewayHost: "0.0.0.0")
+
+        XCTAssertEqual(configurationManager.updatedHosts, ["0.0.0.0"])
+    }
+
+    @MainActor
+    func testGatewayConfigurationClientUpdatesBothHostFields() async throws {
+        let homeDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("ccrbar-config-tests-\(UUID().uuidString)")
+        let ccrDirectory = homeDirectory.appendingPathComponent(".claude-code-router")
+        try FileManager.default.createDirectory(at: ccrDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: homeDirectory) }
+
+        let serviceURL = "http://127.0.0.1:3458/?ccr_web_token=test-token"
+        try Data("{\"url\":\"\(serviceURL)\"}".utf8)
+            .write(to: ccrDirectory.appendingPathComponent("service.json"))
+
+        let configuration: [String: Any] = [
+            "HOST": "127.0.0.1",
+            "PORT": 3456,
+            "gateway": [
+                "host": "127.0.0.1",
+                "port": 3456
+            ]
+        ]
+        let getConfigResponse = try JSONSerialization.data(withJSONObject: [
+            "ok": true,
+            "value": configuration
+        ])
+        let saveConfigResponse = try JSONSerialization.data(withJSONObject: [
+            "ok": true,
+            "value": configuration
+        ])
+        let requests = LockedRPCRequests()
+        let client = CCRWebConfigurationClient(
+            homeDirectory: homeDirectory.path,
+            dataLoader: { request in
+                requests.append(request)
+                let responseData = requests.count == 1 ? getConfigResponse : saveConfigResponse
+                let response = HTTPURLResponse(
+                    url: request.url!,
+                    statusCode: 200,
+                    httpVersion: nil,
+                    headerFields: nil
+                )!
+                return (responseData, response)
+            }
+        )
+
+        try await client.updateGatewayHost("0.0.0.0")
+
+        let capturedRequests = requests.values
+        XCTAssertEqual(capturedRequests.count, 2)
+        XCTAssertEqual(
+            capturedRequests[0].value(forHTTPHeaderField: "x-ccr-web-auth"),
+            "test-token"
+        )
+        let saveBody = try XCTUnwrap(
+            capturedRequests[1].httpBody.flatMap {
+                try? JSONSerialization.jsonObject(with: $0) as? [String: Any]
+            }
+        )
+        let arguments = try XCTUnwrap(saveBody["args"] as? [Any])
+        let savedConfiguration = try XCTUnwrap(arguments[0] as? [String: Any])
+        XCTAssertEqual(savedConfiguration["HOST"] as? String, "0.0.0.0")
+        let savedGateway = try XCTUnwrap(savedConfiguration["gateway"] as? [String: Any])
+        XCTAssertEqual(savedGateway["host"] as? String, "0.0.0.0")
+        let options = try XCTUnwrap(arguments[1] as? [String: Any])
+        XCTAssertEqual(options["applyProfile"] as? Bool, false)
     }
 
     func testCCRCandidateSearchIncludesDesktopBinOutsideLoginPath() {
@@ -408,6 +516,51 @@ private actor StatusCheckProbe {
     func releaseFirstCheck() {
         firstCheckRelease?.resume()
         firstCheckRelease = nil
+    }
+}
+
+private actor GatewayHostProbe {
+    private(set) var requests: [(host: String, port: UInt16)] = []
+
+    func check(host: String, port: UInt16) -> Bool {
+        requests.append((host, port))
+        return false
+    }
+}
+
+@MainActor
+private final class TestGatewayConfigurationManager: CCRGatewayConfigurationManaging {
+    var updatedHosts: [String] = []
+
+    func currentGatewayHost() async throws -> String {
+        AppSettings.defaultGatewayHost
+    }
+
+    func updateGatewayHost(_ host: String) async throws {
+        updatedHosts.append(host)
+    }
+}
+
+private final class LockedRPCRequests: @unchecked Sendable {
+    private let lock = NSLock()
+    private var storedValues: [URLRequest] = []
+
+    var count: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return storedValues.count
+    }
+
+    var values: [URLRequest] {
+        lock.lock()
+        defer { lock.unlock() }
+        return storedValues
+    }
+
+    func append(_ request: URLRequest) {
+        lock.lock()
+        defer { lock.unlock() }
+        storedValues.append(request)
     }
 }
 
