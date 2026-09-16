@@ -9,6 +9,14 @@
 "CCR management UI and status port; changes restart CCR" = "CCR 管理 UI 和状态端口；修改后会重启 CCR";
 "Gateway Host" = "网关监听地址";
 "Gateway API listen address (port 3456); changes restart CCR" = "Gateway API 监听地址（端口 3456）；修改后会重启 CCR";
+"Gateway Access" = "网关访问范围";
+"This Mac only" = "仅本机";
+"Local network" = "局域网";
+"Custom address" = "自定义地址";
+"Detecting local address…" = "正在检测内网地址…";
+"Copy" = "复制";
+"Listens on 127.0.0.1 only; other devices cannot reach the gateway." = "仅监听 127.0.0.1，其他设备无法访问。";
+"Listens on 0.0.0.0:3456 — 127.0.0.1 and the local network both work, even when the IP changes." = "监听 0.0.0.0:3456，127.0.0.1 与内网 IP 同时可用，内网 IP 变化也能自动跟随。";
 "Launch App at Login" = "登录时启动应用";
 "Open CCR Data Folder" = "打开 CCR 数据文件夹";
 "Refresh" = "刷新";

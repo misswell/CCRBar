@@ -9,6 +9,14 @@
 "CCR management UI and status port; changes restart CCR" = "CCR management UI and status port; changes restart CCR";
 "Gateway Host" = "Gateway Host";
 "Gateway API listen address (port 3456); changes restart CCR" = "Gateway API listen address (port 3456); changes restart CCR";
+"Gateway Access" = "Gateway Access";
+"This Mac only" = "This Mac only";
+"Local network" = "Local network";
+"Custom address" = "Custom address";
+"Detecting local address…" = "Detecting local address…";
+"Copy" = "Copy";
+"Listens on 127.0.0.1 only; other devices cannot reach the gateway." = "Listens on 127.0.0.1 only; other devices cannot reach the gateway.";
+"Listens on 0.0.0.0:3456 — 127.0.0.1 and the local network both work, even when the IP changes." = "Listens on 0.0.0.0:3456 — 127.0.0.1 and the local network both work, even when the IP changes.";
 "Launch App at Login" = "Launch App at Login";
 "Open CCR Data Folder" = "Open CCR Data Folder";
 "Refresh" = "Refresh";

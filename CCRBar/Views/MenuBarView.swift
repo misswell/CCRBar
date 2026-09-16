@@ -126,20 +126,56 @@ struct MenuBarView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             HStack {
-                Text("Gateway Host")
+                Text("Gateway Access")
                 Spacer()
-                TextField(
-                    "127.0.0.1",
-                    text: $appState.gatewayHost
-                )
-                .multilineTextAlignment(.trailing)
-                .frame(width: 140)
-                .textFieldStyle(.roundedBorder)
-                .onSubmit {
-                    appState.gatewayHostChanged()
+                Picker("Gateway Access", selection: Binding(
+                    get: { appState.gatewayHostMode },
+                    set: { appState.setGatewayHostMode($0) }
+                )) {
+                    Text("This Mac only").tag(AppSettings.GatewayHostMode.loopback)
+                    Text("Local network").tag(AppSettings.GatewayHostMode.lan)
+                    Text("Custom address").tag(AppSettings.GatewayHostMode.custom)
+                }
+                .labelsHidden()
+                .pickerStyle(.menu)
+                .frame(width: 150)
+            }
+
+            if appState.gatewayHostMode == .custom {
+                HStack {
+                    Text("Gateway Host")
+                    Spacer()
+                    TextField(
+                        "127.0.0.1",
+                        text: $appState.gatewayHost
+                    )
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: 140)
+                    .textFieldStyle(.roundedBorder)
+                    .onSubmit {
+                        appState.gatewayHostChanged()
+                    }
                 }
             }
-            Text("Gateway API listen address (port 3456); changes restart CCR")
+
+            if appState.gatewayHostMode == .lan {
+                HStack(spacing: 6) {
+                    Image(systemName: "network")
+                        .foregroundStyle(.secondary)
+                    Text(localGatewayAddressText)
+                        .font(.callout)
+                        .textSelection(.enabled)
+                    Spacer()
+                    if appState.localNetwork.ipv4Address != nil {
+                        Button("Copy") {
+                            copyLocalGatewayAddress()
+                        }
+                        .controlSize(.small)
+                    }
+                }
+            }
+
+            Text(gatewayAccessCaption)
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Toggle("Launch App at Login", isOn: $appState.launchAtLogin)
@@ -194,6 +230,31 @@ struct MenuBarView: View {
         } message: {
             Text("This will run npm install -g @musistudio/claude-code-router@latest.")
         }
+    }
+
+    private var localGatewayAddressText: String {
+        guard let address = appState.localNetwork.ipv4Address else {
+            return String(localized: "Detecting local address…")
+        }
+        return "http://\(address):\(AppSettings.defaultGatewayPort)"
+    }
+
+    private var gatewayAccessCaption: String {
+        switch appState.gatewayHostMode {
+        case .loopback:
+            return String(localized: "Listens on 127.0.0.1 only; other devices cannot reach the gateway.")
+        case .lan:
+            return String(localized: "Listens on 0.0.0.0:3456 — 127.0.0.1 and the local network both work, even when the IP changes.")
+        case .custom:
+            return String(localized: "Gateway API listen address (port 3456); changes restart CCR")
+        }
+    }
+
+    private func copyLocalGatewayAddress() {
+        guard let address = appState.localNetwork.ipv4Address else { return }
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString("http://\(address):\(AppSettings.defaultGatewayPort)", forType: .string)
     }
 
     @ViewBuilder

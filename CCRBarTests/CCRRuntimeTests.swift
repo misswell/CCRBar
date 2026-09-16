@@ -44,6 +44,61 @@ final class CCRRuntimeTests: XCTestCase {
         withExtendedLifetime(subscription) {}
     }
 
+    func testGatewayHostModeResolvesEffectiveHost() {
+        XCTAssertEqual(
+            AppSettings.effectiveGatewayHost(mode: .loopback, customHost: "10.0.0.9"),
+            AppSettings.defaultGatewayHost
+        )
+        XCTAssertEqual(
+            AppSettings.effectiveGatewayHost(mode: .lan, customHost: "10.0.0.9"),
+            AppSettings.allInterfacesGatewayHost
+        )
+        XCTAssertEqual(
+            AppSettings.effectiveGatewayHost(mode: .custom, customHost: " 10.0.0.9 "),
+            "10.0.0.9"
+        )
+        XCTAssertEqual(
+            AppSettings.effectiveGatewayHost(mode: .custom, customHost: "   "),
+            AppSettings.defaultGatewayHost
+        )
+        XCTAssertEqual(AppSettings.gatewayHostMode(from: "lan"), .lan)
+        XCTAssertEqual(
+            AppSettings.gatewayHostMode(from: "not-a-mode"),
+            AppSettings.defaultGatewayHostMode
+        )
+    }
+
+    func testPreferredLocalIPv4SkipsTunnelsAndLoopback() {
+        let interfaces = [
+            LocalNetworkAddressMonitor.InterfaceAddress(name: "lo0", address: "127.0.0.1"),
+            LocalNetworkAddressMonitor.InterfaceAddress(name: "utun4", address: "10.8.0.2"),
+            LocalNetworkAddressMonitor.InterfaceAddress(name: "awdl0", address: "169.254.10.1"),
+            LocalNetworkAddressMonitor.InterfaceAddress(name: "en1", address: "192.168.1.20"),
+            LocalNetworkAddressMonitor.InterfaceAddress(name: "en0", address: "172.16.80.3")
+        ]
+
+        XCTAssertEqual(
+            LocalNetworkAddressMonitor.preferredIPv4(from: interfaces),
+            "172.16.80.3"
+        )
+    }
+
+    func testPreferredLocalIPv4FallsBackToAnyActiveInterface() {
+        let interfaces = [
+            LocalNetworkAddressMonitor.InterfaceAddress(name: "lo0", address: "127.0.0.1"),
+            LocalNetworkAddressMonitor.InterfaceAddress(name: "utun0", address: "100.64.0.1"),
+            LocalNetworkAddressMonitor.InterfaceAddress(name: "eth7", address: "10.20.30.40")
+        ]
+
+        XCTAssertEqual(
+            LocalNetworkAddressMonitor.preferredIPv4(from: interfaces),
+            "10.20.30.40"
+        )
+        XCTAssertNil(LocalNetworkAddressMonitor.preferredIPv4(from: [
+            LocalNetworkAddressMonitor.InterfaceAddress(name: "lo0", address: "127.0.0.1")
+        ]))
+    }
+
     @MainActor
     func testStatusCheckUsesConfiguredGatewayHost() async {
         let probe = GatewayHostProbe()

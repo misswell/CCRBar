@@ -43,11 +43,13 @@ final class AppState: ObservableObject {
     let statusMonitor: CCRStatusMonitor
     let updateManager: UpdateManager
     let ccrUpdateManager: CCRUpdateManager
+    let localNetwork = LocalNetworkAddressMonitor()
 
     @AppStorage("autoStartCCR") var autoStartCCR = true
     @AppStorage("launchAtLogin") var launchAtLogin = false
     @AppStorage(AppSettings.managementPortKey) private var storedManagementPort = Int(AppSettings.defaultManagementPort)
     @AppStorage(AppSettings.gatewayHostKey) var gatewayHost = AppSettings.defaultGatewayHost
+    @AppStorage(AppSettings.gatewayHostModeKey) private var storedGatewayHostMode = AppSettings.defaultGatewayHostMode.rawValue
 
     private let autoStartCoordinator = CCRAutoStartCoordinator()
     private var autoStartGeneration = 0
@@ -64,7 +66,11 @@ final class AppState: ObservableObject {
     }
 
     var gatewayHostValue: String {
-        AppSettings.validatedGatewayHost(gatewayHost)
+        AppSettings.effectiveGatewayHost(mode: gatewayHostMode, customHost: gatewayHost)
+    }
+
+    var gatewayHostMode: AppSettings.GatewayHostMode {
+        AppSettings.gatewayHostMode(from: storedGatewayHostMode)
     }
 
     init() {
@@ -88,7 +94,8 @@ final class AppState: ObservableObject {
             resolver.objectWillChange,
             serviceManager.objectWillChange,
             statusMonitor.objectWillChange,
-            ccrUpdateManager.objectWillChange
+            ccrUpdateManager.objectWillChange,
+            localNetwork.objectWillChange
         ] {
             publisher
                 .sink { [weak self] _ in
@@ -101,6 +108,7 @@ final class AppState: ObservableObject {
     func start() {
         updateManager.start()
         resolver.refresh()
+        localNetwork.start()
         Task { await ccrUpdateManager.check() }
         statusMonitor.start(
             managementPort: managementPortValue,
@@ -185,6 +193,16 @@ final class AppState: ObservableObject {
 
     func gatewayHostChanged() {
         gatewayHost = AppSettings.validatedGatewayHost(gatewayHost)
+        applyGatewayHost()
+    }
+
+    func setGatewayHostMode(_ mode: AppSettings.GatewayHostMode) {
+        guard mode != gatewayHostMode else { return }
+        storedGatewayHostMode = mode.rawValue
+        applyGatewayHost()
+    }
+
+    private func applyGatewayHost() {
         let host = gatewayHostValue
         let managementIsUp = statusMonitor.managementUp
 
@@ -243,7 +261,21 @@ final class AppState: ObservableObject {
     }
 
     private func synchronizeGatewayHost() async {
-        guard let configuredHost = await serviceManager.currentGatewayHost() else { return }
-        gatewayHost = AppSettings.validatedGatewayHost(configuredHost)
+        let configuredHost = await serviceManager.currentGatewayHost()
+        if let configuredHost,
+           configuredHost != AppSettings.defaultGatewayHost,
+           configuredHost != AppSettings.allInterfacesGatewayHost {
+            // Keep a concrete custom address around so switching to the custom
+            // mode restores what CCR was last configured with.
+            gatewayHost = AppSettings.validatedGatewayHost(configuredHost)
+        }
+
+        let desiredHost = gatewayHostValue
+        guard configuredHost != desiredHost else { return }
+        _ = await serviceManager.updateGatewayHost(desiredHost)
+        await statusMonitor.check(
+            managementPort: managementPortValue,
+            gatewayHost: desiredHost
+        )
     }
 }

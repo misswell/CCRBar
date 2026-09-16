@@ -66,7 +66,7 @@ final class CCRStatusMonitor: ObservableObject {
         let managementPort = self.managementPort
         let gatewayHost = self.gatewayHost
 
-        async let gateway = portChecker(gatewayHost, 3456)
+        async let gateway = portChecker(gatewayHost, AppSettings.defaultGatewayPort)
         async let management = portChecker(AppSettings.defaultGatewayHost, managementPort)
         let (gatewayUp, managementUp) = await (gateway, management)
 
