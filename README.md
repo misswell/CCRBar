@@ -66,6 +66,7 @@ npm install -g @musistudio/claude-code-router
 
 ## 最近更新
 
+- `v0.1.18`：启动 CCR 前检查已有服务，并通过跨进程锁避免多实例重复启动导致核心网关端口冲突。
 - `v0.1.16`：新增 Gateway 监听地址设置；可绑定局域网 IP 或 `0.0.0.0`，保存后自动重启 CCR，并按配置地址监测 Gateway 状态。
 - `v0.1.15`：修复 CCR 本体更新检测——桌面版不再只显示「自行更新」，而是读取已安装的 `Claude Code Router.app` 版本并与官方最新版对比；CCR 版本与更新状态常驻菜单面板顶部，CLI 的 npm 查询失败时回退到官方发布源。
 - `v0.1.14`：新增 CCR CLI 本体版本检测与更新；桌面版提示由 CCR Desktop 自行管理更新。

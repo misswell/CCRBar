@@ -213,6 +213,55 @@ final class CCRRuntimeTests: XCTestCase {
     }
 
     @MainActor
+    func testStartSkipsCommandWhenCCRIsAlreadyRunning() async {
+        let resolver = TestExecutableResolver()
+        let statusMonitor = CCRStatusMonitor(portChecker: { _, _ in true })
+        let configurationManager = TestGatewayConfigurationManager()
+        let calls = LockedCommandCalls()
+        let manager = CCRServiceManager(
+            resolver: resolver,
+            statusMonitor: statusMonitor,
+            gatewayConfigurationManager: configurationManager,
+            commandExecutor: { executable, arguments, _ in
+                calls.append(executable: executable, arguments: arguments)
+                return CommandResult(stdout: "", stderr: "", exitCode: 0)
+            }
+        )
+
+        await manager.start(port: 3458, gatewayHost: "0.0.0.0")
+
+        XCTAssertFalse(calls.contains(arguments: ["start", "--port", "3458", "--no-open"]))
+        XCTAssertEqual(statusMonitor.status, .running)
+    }
+
+    @MainActor
+    func testStartTreatsPortRaceAsSuccessWhenCCRBecomesReachable() async {
+        let resolver = TestExecutableResolver()
+        let probe = MutablePortProbe()
+        let statusMonitor = CCRStatusMonitor(portChecker: { _, _ in probe.isReachable })
+        let configurationManager = TestGatewayConfigurationManager()
+        let manager = CCRServiceManager(
+            resolver: resolver,
+            statusMonitor: statusMonitor,
+            gatewayConfigurationManager: configurationManager,
+            commandExecutor: { _, _, _ in
+                probe.setReachable(true)
+                return CommandResult(
+                    stdout: "",
+                    stderr: "核心网关端点已被占用: http://127.0.0.1:3478",
+                    exitCode: 1
+                )
+            }
+        )
+
+        await manager.start(port: 3458, gatewayHost: "0.0.0.0")
+
+        XCTAssertNil(manager.lastErrorText)
+        XCTAssertEqual(statusMonitor.status, .running)
+        XCTAssertEqual(configurationManager.updatedHosts, ["0.0.0.0"])
+    }
+
+    @MainActor
     func testGatewayConfigurationClientUpdatesBothHostFields() async throws {
         let homeDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("ccrbar-config-tests-\(UUID().uuidString)")
@@ -580,6 +629,23 @@ private actor GatewayHostProbe {
     func check(host: String, port: UInt16) -> Bool {
         requests.append((host, port))
         return false
+    }
+}
+
+private final class MutablePortProbe: @unchecked Sendable {
+    private let lock = NSLock()
+    private var reachable = false
+
+    var isReachable: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return reachable
+    }
+
+    func setReachable(_ value: Bool) {
+        lock.lock()
+        reachable = value
+        lock.unlock()
     }
 }
 

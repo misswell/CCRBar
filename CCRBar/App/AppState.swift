@@ -120,7 +120,6 @@ final class AppState: ObservableObject {
         }
 
         if autoStartCCR && resolver.canRunCCR {
-            statusMonitor.setStarting()
             let generation = autoStartGeneration
             autoStartCoordinator.schedule(delayNanoseconds: 1_500_000_000) { [weak self] in
                 guard let self else { return }
@@ -252,7 +251,7 @@ final class AppState: ObservableObject {
             gatewayHost: gatewayHostValue
         )
         guard generation == autoStartGeneration, !Task.isCancelled else { return }
-        guard statusMonitor.status != .running else { return }
+        guard !statusMonitor.managementUp, !statusMonitor.gatewayUp else { return }
         await serviceManager.start(
             port: managementPortValue,
             gatewayHost: gatewayHostValue,

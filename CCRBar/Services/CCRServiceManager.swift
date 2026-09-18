@@ -19,6 +19,7 @@ final class CCRServiceManager: ObservableObject {
     private let resolver: CCRExecutableResolving
     private let statusMonitor: CCRStatusMonitor
     private let gatewayConfigurationManager: CCRGatewayConfigurationManaging
+    private let startLock: CCRStartLocking
     private let commandExecutor: @Sendable (String, [String], [String: String]?) -> CommandResult
     private var operationTask: Task<Void, Never>?
     private var operationGeneration = 0
@@ -29,6 +30,7 @@ final class CCRServiceManager: ObservableObject {
         resolver: CCRExecutableResolving,
         statusMonitor: CCRStatusMonitor,
         gatewayConfigurationManager: CCRGatewayConfigurationManaging? = nil,
+        startLock: CCRStartLocking? = nil,
         commandExecutor: @escaping @Sendable (String, [String], [String: String]?) -> CommandResult = {
             CommandRunner.run(executable: $0, arguments: $1, environment: $2)
         }
@@ -36,6 +38,7 @@ final class CCRServiceManager: ObservableObject {
         self.resolver = resolver
         self.statusMonitor = statusMonitor
         self.gatewayConfigurationManager = gatewayConfigurationManager ?? CCRWebConfigurationClient()
+        self.startLock = startLock ?? CCRStartLock()
         self.commandExecutor = commandExecutor
     }
 
@@ -57,17 +60,13 @@ final class CCRServiceManager: ObservableObject {
 
         await enqueueOperation { [weak self] in
             guard let self else { return }
-            self.statusMonitor.setStarting()
-            var arguments = ["start", "--port", String(port), "--no-open"]
-            if !startGateway {
-                arguments.append("--no-gateway")
-            }
-            let started = await self.runCommand(arguments)
-            await self.finishStarting(
+            guard await self.startLock.acquire() else { return }
+            defer { self.startLock.release() }
+
+            _ = await self.startIfNeeded(
                 managementPort: port,
                 gatewayHost: gatewayHost,
-                commandSucceeded: started,
-                updateGateway: startGateway
+                startGateway: startGateway
             )
         }
     }
@@ -119,17 +118,18 @@ final class CCRServiceManager: ObservableObject {
 
         await enqueueOperation { [weak self] in
             guard let self else { return }
+            guard await self.startLock.acquire() else { return }
+            defer { self.startLock.release() }
+
             self.statusMonitor.setStopping()
             _ = await self.runCommand(["stop"])
             await self.statusMonitor.check()
             try? await Task.sleep(nanoseconds: 500_000_000)
-            self.statusMonitor.setStarting()
-            let started = await self.runCommand(["start", "--port", String(port), "--no-open"])
-            await self.finishStarting(
+
+            _ = await self.startIfNeeded(
                 managementPort: port,
                 gatewayHost: gatewayHost,
-                commandSucceeded: started,
-                updateGateway: true
+                startGateway: true
             )
         }
     }
@@ -147,6 +147,67 @@ final class CCRServiceManager: ObservableObject {
             managementPort: managementPort,
             gatewayHost: gatewayHost
         )
+    }
+
+    @discardableResult
+    private func startIfNeeded(
+        managementPort: UInt16,
+        gatewayHost: String,
+        startGateway: Bool
+    ) async -> Bool {
+        // A second CCRBar instance can enter this method after the first one
+        // has already started CCR. Re-check while holding the cross-process
+        // lock so the second instance reuses the running service instead of
+        // launching another gateway.
+        await statusMonitor.check(
+            managementPort: managementPort,
+            gatewayHost: gatewayHost
+        )
+        if statusMonitor.managementUp || statusMonitor.gatewayUp {
+            markStartSatisfied()
+            return true
+        }
+
+        statusMonitor.setStarting()
+        var arguments = ["start", "--port", String(managementPort), "--no-open"]
+        if !startGateway {
+            arguments.append("--no-gateway")
+        }
+
+        let commandSucceeded = await runCommand(arguments)
+        let serviceBecameReachable: Bool
+        if commandSucceeded {
+            serviceBecameReachable = false
+        } else {
+            serviceBecameReachable = await serviceIsReachable(
+                managementPort: managementPort,
+                gatewayHost: gatewayHost
+            )
+        }
+        let succeeded = commandSucceeded || serviceBecameReachable
+
+        await finishStarting(
+            managementPort: managementPort,
+            gatewayHost: gatewayHost,
+            commandSucceeded: succeeded,
+            updateGateway: startGateway
+        )
+        return succeeded
+    }
+
+    private func serviceIsReachable(
+        managementPort: UInt16,
+        gatewayHost: String
+    ) async -> Bool {
+        await statusMonitor.check(
+            managementPort: managementPort,
+            gatewayHost: gatewayHost
+        )
+        return statusMonitor.managementUp || statusMonitor.gatewayUp
+    }
+
+    private func markStartSatisfied() {
+        lastResult = CommandResult(stdout: "", stderr: "", exitCode: 0)
     }
 
     func openDashboard(port: UInt16) {
