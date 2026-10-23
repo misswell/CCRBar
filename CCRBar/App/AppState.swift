@@ -145,6 +145,7 @@ final class AppState: ObservableObject {
 
     func refresh() {
         resolver.refresh()
+        serviceManager.clearLastError()
         Task { await ccrUpdateManager.check() }
         refreshStatus()
     }

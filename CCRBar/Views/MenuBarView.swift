@@ -86,9 +86,12 @@ struct MenuBarView: View {
             .disabled(startDisabled)
 
             Button("Open Dashboard") {
-                appState.serviceManager.openDashboard(port: appState.managementPortValue)
+                appState.serviceManager.openDashboard(
+                    port: appState.managementPortValue,
+                    managementIsUp: appState.statusMonitor.managementUp
+                )
             }
-            .disabled(!appState.resolver.canRunCCR)
+            .disabled(!appState.resolver.canRunCCR && !appState.statusMonitor.managementUp)
 
             Button("Restart CCR") {
                 Task {

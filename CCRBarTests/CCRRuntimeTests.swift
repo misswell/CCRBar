@@ -261,6 +261,29 @@ final class CCRRuntimeTests: XCTestCase {
         XCTAssertEqual(configurationManager.updatedHosts, ["0.0.0.0"])
     }
 
+    func testManagementURLRequiresMatchingPortAndToken() throws {
+        let homeDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("ccrbar-service-tests-\(UUID().uuidString)")
+        let dataDirectory = homeDirectory.appendingPathComponent(".claude-code-router")
+        try FileManager.default.createDirectory(at: dataDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: homeDirectory) }
+
+        let descriptor = """
+        {"url":"http://127.0.0.1:3458/?ccr_web_token=test-token"}
+        """
+        try descriptor.write(
+            to: dataDirectory.appendingPathComponent("service.json"),
+            atomically: true,
+            encoding: .utf8
+        )
+
+        XCTAssertEqual(
+            CCRServiceManager.managementURL(port: 3458, homeDirectory: homeDirectory.path),
+            URL(string: "http://127.0.0.1:3458/?ccr_web_token=test-token")
+        )
+        XCTAssertNil(CCRServiceManager.managementURL(port: 3459, homeDirectory: homeDirectory.path))
+    }
+
     @MainActor
     func testGatewayConfigurationClientUpdatesBothHostFields() async throws {
         let homeDirectory = FileManager.default.temporaryDirectory
@@ -352,6 +375,42 @@ final class CCRRuntimeTests: XCTestCase {
         let description = try XCTUnwrap(runtime.nodeRuntimeDescription)
         XCTAssertTrue(description.contains("v24.16.0"))
         XCTAssertTrue(description.contains(String(localized: "Bundled Node.js")))
+    }
+
+    @MainActor
+    func testDesktopAppBundleRuntimePrependsCLIEntryAndRunsAsNode() async {
+        let executable = "/Applications/Claude Code Router.app/Contents/MacOS/Claude Code Router"
+        let cliEntry = "/Applications/Claude Code Router.app/Contents/Resources/app.asar/dist/main/cli.js"
+        let runtime = CCRRuntime(
+            ccrPath: executable,
+            nodePath: executable,
+            nodeVersion: CCRRuntime.minimumNodeVersion,
+            nodeVersionString: "bundled",
+            source: .desktop,
+            issue: nil,
+            launchArguments: [cliEntry]
+        )
+
+        XCTAssertEqual(runtime.environment?["ELECTRON_RUN_AS_NODE"], "1")
+        XCTAssertTrue(runtime.canRun)
+
+        let resolver = TestExecutableResolver(runtime: runtime)
+        let statusMonitor = CCRStatusMonitor(portChecker: { _, _ in false })
+        let manager = CCRServiceManager(
+            resolver: resolver,
+            statusMonitor: statusMonitor,
+            gatewayConfigurationManager: TestGatewayConfigurationManager(),
+            commandExecutor: { commandExecutable, arguments, environment in
+                XCTAssertEqual(commandExecutable, executable)
+                XCTAssertEqual(environment?["ELECTRON_RUN_AS_NODE"], "1")
+                XCTAssertEqual(arguments, [cliEntry, "stop"])
+                return CommandResult(stdout: "", stderr: "", exitCode: 0)
+            }
+        )
+
+        await manager.stop()
+
+        XCTAssertNil(manager.lastErrorText)
     }
 
     func testSystemNodeFourteenIsRejectedOnlyForSystemRuntime() {
@@ -687,16 +746,22 @@ private final class LockedRPCRequests: @unchecked Sendable {
 
 @MainActor
 private final class TestExecutableResolver: CCRExecutableResolving {
-    let runtime = CCRRuntime(
-        ccrPath: "/test/ccr-app",
-        nodePath: "/test/node",
-        nodeVersion: Version(24, 0, 0),
-        nodeVersionString: "v24.0.0",
-        source: .desktop,
-        issue: nil
-    )
+    let runtime: CCRRuntime
+    let environment: [String: String]?
 
-    let environment: [String: String]? = nil
+    init(
+        runtime: CCRRuntime = CCRRuntime(
+            ccrPath: "/test/ccr-app",
+            nodePath: "/test/node",
+            nodeVersion: Version(24, 0, 0),
+            nodeVersionString: "v24.0.0",
+            source: .desktop,
+            issue: nil
+        )
+    ) {
+        self.runtime = runtime
+        self.environment = runtime.environment
+    }
 }
 
 @MainActor

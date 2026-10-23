@@ -36,6 +36,10 @@ struct CCRRuntime: Equatable {
     let source: Source
     let loginPath: String?
     let issue: Issue?
+    /// Arguments the executable needs before the CCR command. A desktop app
+    /// bundle is launched through its bundled Electron binary, with the CLI
+    /// entry inside `app.asar` supplied here.
+    let launchArguments: [String]
 
     init(
         ccrPath: String?,
@@ -44,7 +48,8 @@ struct CCRRuntime: Equatable {
         nodeVersionString: String?,
         source: Source,
         loginPath: String? = nil,
-        issue: Issue?
+        issue: Issue?,
+        launchArguments: [String] = []
     ) {
         self.ccrPath = ccrPath
         self.nodePath = nodePath
@@ -53,6 +58,7 @@ struct CCRRuntime: Equatable {
         self.source = source
         self.loginPath = loginPath
         self.issue = issue
+        self.launchArguments = launchArguments
     }
 
     static let unavailable = CCRRuntime(
@@ -114,7 +120,16 @@ struct CCRRuntime: Equatable {
             paths.insert(nodeDirectory, at: 0)
         }
 
-        guard !paths.isEmpty else { return nil }
-        return ["PATH": paths.joined(separator: ":")]
+        var environment: [String: String] = [:]
+        if !paths.isEmpty {
+            environment["PATH"] = paths.joined(separator: ":")
+        }
+        if isCCRApp {
+            // The `ccr-app` wrapper sets this itself; the app-bundle fallback
+            // launches the Electron binary directly, which needs it to behave
+            // as a plain Node.js runtime.
+            environment["ELECTRON_RUN_AS_NODE"] = "1"
+        }
+        return environment.isEmpty ? nil : environment
     }
 }

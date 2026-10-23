@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import Combine
 
@@ -210,17 +211,61 @@ final class CCRServiceManager: ObservableObject {
         lastResult = CommandResult(stdout: "", stderr: "", exitCode: 0)
     }
 
-    func openDashboard(port: UInt16) {
-        guard resolver.runtime.canRun, let ccrPath = resolver.runtime.ccrPath else { return }
+    func openDashboard(port: UInt16, managementIsUp: Bool) {
+        // A running management service already serves the UI, but the page's
+        // RPC calls need the token from service.json. That descriptor lives in
+        // the CCR data folder and can disappear independently of the process.
+        if managementIsUp, let url = Self.managementURL(port: port) {
+            lastCommand = "open http://\(AppSettings.defaultGatewayHost):\(port)/"
+            let opened = NSWorkspace.shared.open(url)
+            lastResult = opened
+                ? CommandResult(stdout: "", stderr: "", exitCode: 0)
+                : CommandResult(stdout: "", stderr: String(localized: "Failed to open the CCR management page"), exitCode: -1)
+            return
+        }
+
+        guard resolver.runtime.canRun, let ccrPath = resolver.runtime.ccrPath else {
+            lastResult = CommandResult(
+                stdout: "",
+                stderr: String(localized: "The CCR management page is unavailable. Restart CCR to recreate it."),
+                exitCode: -1
+            )
+            return
+        }
         lastCommand = "ccr ui --port \(port)"
         let launched = CommandRunner.launch(
             executable: ccrPath,
-            arguments: ["ui", "--port", String(port)],
+            arguments: resolver.runtime.launchArguments + ["ui", "--port", String(port)],
             environment: resolver.environment
         )
         lastResult = launched
             ? CommandResult(stdout: "", stderr: "", exitCode: 0)
             : CommandResult(stdout: "", stderr: String(localized: "Failed to launch ccr ui"), exitCode: -1)
+    }
+
+    nonisolated static func managementURL(
+        port: UInt16,
+        homeDirectory: String = NSHomeDirectory()
+    ) -> URL? {
+        let descriptorURL = URL(fileURLWithPath: homeDirectory)
+            .appendingPathComponent(".claude-code-router/service.json")
+        guard let data = try? Data(contentsOf: descriptorURL),
+              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let urlString = object["url"] as? String,
+              let url = URL(string: urlString),
+              url.port == Int(port),
+              let token = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                .queryItems?
+                .first(where: { $0.name == "ccr_web_token" })?.value,
+              !token.isEmpty else {
+            return nil
+        }
+        return url
+    }
+
+    func clearLastError() {
+        lastCommand = nil
+        lastResult = nil
     }
 
     private func beginOperation() {
@@ -268,8 +313,9 @@ final class CCRServiceManager: ObservableObject {
 
         let environment = resolver.environment
         let commandExecutor = commandExecutor
+        let launchArguments = resolver.runtime.launchArguments + arguments
         let result = await Task.detached(priority: .userInitiated) {
-            commandExecutor(ccrPath, arguments, environment)
+            commandExecutor(ccrPath, launchArguments, environment)
         }.value
 
         lastResult = result

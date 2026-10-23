@@ -60,6 +60,21 @@ final class CCRExecutableResolver: ObservableObject {
                 loginPath: loginPath,
                 issue: nil
             )
+        } else if normalCandidate == nil,
+                  let appBundleRuntime = resolveAppBundleRuntime() {
+            // The desktop app regenerates `bin/ccr-app` on launch, but its data
+            // folder can disappear between launches. Keep controlling the
+            // installed app by running its CLI straight from the app bundle.
+            runtime = CCRRuntime(
+                ccrPath: appBundleRuntime.executablePath,
+                nodePath: appBundleRuntime.executablePath,
+                nodeVersion: CCRRuntime.minimumNodeVersion,
+                nodeVersionString: "bundled",
+                source: .desktop,
+                loginPath: loginPath,
+                issue: nil,
+                launchArguments: [appBundleRuntime.cliPath]
+            )
         } else if let desktopCandidate {
             runtime = CCRRuntime(
                 ccrPath: desktopCandidate,
@@ -174,9 +189,13 @@ final class CCRExecutableResolver: ObservableObject {
             }
         }
 
+        return installedDesktopAppBundlePath(home: NSHomeDirectory())
+    }
+
+    nonisolated static func installedDesktopAppBundlePath(home: String) -> String? {
         let candidates = [
             "/Applications/Claude Code Router.app",
-            URL(fileURLWithPath: NSHomeDirectory())
+            URL(fileURLWithPath: home)
                 .appendingPathComponent("Applications/Claude Code Router.app")
                 .path
         ]
@@ -330,6 +349,35 @@ final class CCRExecutableResolver: ObservableObject {
         guard let version = Version(versionString) else { return nil }
 
         return NodeRuntime(path: path, version: version, versionString: versionString)
+    }
+
+    private struct AppBundleRuntime {
+        let executablePath: String
+        let cliPath: String
+    }
+
+    private func resolveAppBundleRuntime() -> AppBundleRuntime? {
+        guard let bundlePath = Self.installedDesktopAppBundlePath(home: NSHomeDirectory()) else {
+            return nil
+        }
+
+        let executablePath = URL(fileURLWithPath: bundlePath)
+            .appendingPathComponent("Contents/MacOS/Claude Code Router")
+            .path
+        let asarPath = URL(fileURLWithPath: bundlePath)
+            .appendingPathComponent("Contents/Resources/app.asar")
+            .path
+        guard FileManager.default.isExecutableFile(atPath: executablePath),
+              FileManager.default.fileExists(atPath: asarPath) else {
+            return nil
+        }
+
+        // Paths inside app.asar are virtual to Electron, so FileManager cannot
+        // verify the entry itself; the desktop app's layout always has it.
+        return AppBundleRuntime(
+            executablePath: executablePath,
+            cliPath: asarPath + "/dist/main/cli.js"
+        )
     }
 
     private func resolveBundledNodeRuntime(at ccrPath: String) -> NodeRuntime? {
